@@ -1,0 +1,40 @@
+{#
+ # PDF-only markup. See report_client.html.twig for why it stays this flat.
+ #}
+<table width="100%" cellpadding="2" cellspacing="0">
+  <tr>
+    <td width="100%" style="border-bottom:0.6pt solid #cbd5e1;color:#5b6674;font-size:7.5pt;"><b>HORAS CONTRATADAS X TRABALHADAS</b></td>
+  </tr>
+</table>
+
+<table width="100%" cellpadding="4" cellspacing="0" style="font-size:8pt;">
+  <thead>
+    <tr style="background-color:#1a3a5c;color:#ffffff;">
+      <th width="52%" align="left">Cliente</th>
+      <th width="16%" align="right">Contratadas</th>
+      <th width="16%" align="right">Trabalhadas</th>
+      <th width="16%" align="right">%</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <tr style="background-color:{{ loop.index is odd ? '#ffffff' : '#f7f8fa' }};">
+      <td width="52%" align="left">{{ row.nome }}</td>
+      <td width="16%" align="right">{{ row.horas_contratadas_fmt }}</td>
+      <td width="16%" align="right">{{ row.horas_trabalhadas_fmt }}</td>
+      <td width="16%" align="right" style="color:{% if row.percentual >= 100 %}#c0392b{% elseif row.percentual >= 80 %}#b7791f{% else %}#0f6e56{% endif %};"><b>{{ row.percentual_fmt }}%</b></td>
+    </tr>
+    {% else %}
+    <tr>
+      <td width="100%" colspan="4" align="center" style="color:#94a3b8;">Nenhum cliente com contrato no período.</td>
+    </tr>
+    {% endfor %}
+
+    <tr style="background-color:#1a3a5c;color:#ffffff;">
+      <td width="52%" align="left"><b>Total</b></td>
+      <td width="16%" align="right"><b>{{ total_contratadas_fmt }}</b></td>
+      <td width="16%" align="right"><b>{{ total_trabalhadas_fmt }}</b></td>
+      <td width="16%" align="right"><b>{{ total_percentual_fmt }}%</b></td>
+    </tr>
+  </tbody>
+</table>

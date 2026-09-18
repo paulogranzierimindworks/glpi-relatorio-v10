@@ -1,0 +1,666 @@
+{
+  "name": "relatorio-glpi-comercial",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    t.id AS Num_Chamado,\n    e.name AS Cliente,\n    e.id AS Entidade,\n    \n    CASE\n        WHEN t.type = 1 THEN 'Incidente'\n        WHEN t.type = 2 THEN 'Requisição'\n    END AS TipoChamado,\n\n    t.name AS Titulo,\n    CASE \n        WHEN t.solvedate > t.time_to_resolve THEN 'Violação'\n        ELSE 'Normal'\n    END AS Situacao,\n    \n    ct.completename AS Categoria,\n\n    (SELECT CONCAT(u.firstname, ' ', u.realname)\n     FROM glpi_tickets_users tu\n     INNER JOIN glpi_users u ON tu.users_id = u.id\n     WHERE tu.type = 1 AND tu.tickets_id = t.id\n     LIMIT 1) AS Requerente,\n\n    -- Técnico\n    (SELECT CONCAT(u.firstname, ' ', u.realname)\n     FROM glpi_tickets_users tu\n     INNER JOIN glpi_users u ON tu.users_id = u.id\n     WHERE tu.type = 2 AND tu.tickets_id = t.id\n     LIMIT 1) AS Tecnico,\n\n    t.date AS DataHoraAbertura,\n    t.time_to_resolve AS tempoParaResolver,\n    t.solvedate AS DataHoraSolucao,\n    t.closedate AS DataHoraFechamento,\n\n    -- Tempo em segundos (base)\n    COALESCE((\n        SELECT SUM(tt.actiontime)\n        FROM glpi_tickettasks tt\n        WHERE tt.tickets_id = t.id\n    ), 0) AS Tempo_Trabalhado_Segundos,\n\n    -- Tempo formatado (HH:MM:SS)\n    SEC_TO_TIME(\n        COALESCE((\n            SELECT SUM(tt.actiontime)\n            FROM glpi_tickettasks tt\n            WHERE tt.tickets_id = t.id\n        ), 0)\n    ) AS Tempo_Trabalhado_Formatado\n\nFROM glpi_tickets t\n\nINNER JOIN glpi_entities e \n    ON t.entities_id = e.id\n\nLEFT JOIN glpi_itilcategories ct \n    ON t.itilcategories_id = ct.id\n\nWHERE \n    t.is_deleted = 0\n    AND t.entities_id =   {{ $json.body.contratoId }}  \n    AND t.date BETWEEN '{{ $json.body.dataInicial }}' AND '{{ $json.body.dataFinal }}'\n\nORDER BY t.date ASC;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        368,
+        16
+      ],
+      "id": "add0cc83-78b6-476c-96fe-b2555ee1cf54",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "mySql": {
+          "id": "VdCbZfkse86MeUKQ",
+          "name": "GLPI-Produção"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const formatarData = (data) => {\n  const d = new Date(data);\n  return d.toLocaleDateString('pt-BR');\n};\n\nconst formatarDataHora = (data) => {\n  if (!data) return '-';\n  const d = new Date(data);\n  return d.toLocaleString('pt-BR');\n};\n\nconst allItems = $input.all();\nconst dataInicio = formatarData($('Webhook1').first().json.body.dataInicial);\nconst dataFim = formatarData($('Webhook1').first().json.body.dataFinal);\n\n// Separa chamados (têm Num_Chamado) de categorias (têm Tempo_Total_Formatado)\nconst chamados = allItems.filter(i => i.json.Num_Chamado != null);\nconst categorias = allItems.filter(i => i.json.Tempo_Total_Formatado != null && i.json.Num_Chamado == null);\n\nconst cliente = chamados.length > 0 ? chamados[0].json.Cliente : 'Cliente';\n\n// Totais\nlet totalSegundos = 0;\nlet violacoes = 0;\n\nlet rowsChamados = '';\n\nfor (const item of chamados) {\n  totalSegundos += Number(item.json.Tempo_Trabalhado_Segundos || 0);\n\n  const badgeTipo = item.json.TipoChamado === 'Incidente'\n    ? `<span style=\"display:inline-block;font-size:11px;font-weight:500;padding:2px 6px;border-radius:4px;background:#FAECE7;color:#993C1D;\">Incidente</span>`\n    : `<span style=\"display:inline-block;font-size:11px;font-weight:500;padding:2px 6px;border-radius:4px;background:#E6F1FB;color:#185FA5;\">Requisição</span>`;\n\n  rowsChamados += `\n  <tr>\n    <td style=\"padding:8px;border-bottom:0.5px solid #e5e7eb;color:#111;\">\n      ${item.json.Num_Chamado}\n    </td>\n\n    <td style=\"padding:8px;border-bottom:0.5px solid #e5e7eb;\">\n      ${badgeTipo}\n    </td>\n\n    <td style=\"padding:8px;border-bottom:0.5px solid #e5e7eb;color:#111;word-break:break-word;\">\n      ${item.json.Titulo || '-'}\n    </td>\n\n    <td class=\"hide-mobile\" style=\"padding:8px;border-bottom:0.5px solid #e5e7eb;\">\n      ${item.json.Categoria || 'Sem categoria'}\n    </td>\n\n    <td class=\"hide-mobile\" style=\"padding:8px;border-bottom:0.5px solid #e5e7eb;\">\n      ${item.json.Tecnico || '-'}\n    </td>\n\n    <td class=\"hide-mobile\" style=\"padding:8px;border-bottom:0.5px solid #e5e7eb;\">\n      ${formatarDataHora(item.json.DataHoraSolucao)}\n    </td>\n\n    <td class=\"hide-mobile\" style=\"padding:8px;border-bottom:0.5px solid #e5e7eb;\">\n      ${formatarDataHora(item.json.DataHoraFechamento)}\n    </td>\n\n    <td style=\"padding:8px;border-bottom:0.5px solid #e5e7eb;\">\n      ${item.json.Tempo_Trabalhado_Formatado || '00:00:00'}\n    </td>\n  </tr>`;\n}\n\n// Total formatado\nconst totalFormatado = new Date(totalSegundos * 1000).toISOString().substring(11, 19);\nconst pctSLA = chamados.length > 0 ? ((1 - violacoes / chamados.length) * 100).toFixed(1) : '0.0';\nconst corSLA = parseFloat(pctSLA) >= 90 ? '#0F6E56' : '#c0392b';\nconst corViolacoes = violacoes > 0 ? '#c0392b' : '#0F6E56';\n\nlet rowsCategorias = '';\nfor (const item of categorias) {\n  rowsCategorias += `\n    <tr>\n      <td style=\"padding:10px;border-bottom:0.5px solid #e5e7eb;color:#111;\">${item.json.Categoria}</td>\n      <td style=\"padding:10px;border-bottom:0.5px solid #e5e7eb;color:#111;text-align:right;\">${item.json.Tempo_Total_Formatado}</td>\n    </tr>`;\n}\n\nconst dataGeracao = new Date().toLocaleString('pt-BR');\n\nconst html = `<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<style>\n  body { margin:0; padding:0; background:#f0f2f5; font-family:Arial,sans-serif; }\n\n  @media only screen and (max-width: 600px) {\n    .container { padding: 0 8px !important; }\n    .card { border-radius: 0 !important; }\n    .content { padding: 16px !important; }\n    .hide-mobile { display: none !important; }\n    .table td, .table th { font-size: 11px !important; padding: 6px !important; }\n    .metric { display:block !important; width:100% !important; margin-bottom:10px; }\n    .title { font-size:16px !important; }\n  }\n</style>\n</head>\n\n<body>\n\n<div class=\"container\" style=\"max-width:780px;margin:24px auto;padding:0 12px;\">\n<div class=\"card\" style=\"background:#ffffff;border-radius:10px;overflow:hidden;border:1px solid #e0e0e0;\">\n\n  <!-- HEADER -->\n  <div style=\"background:#1a3a5c;padding:24px;\">\n    <div style=\"font-size:11px;color:#7eadd4;font-weight:bold;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;\">\n      Mindworks · Relatório\n    </div>\n    <div class=\"title\" style=\"font-size:20px;font-weight:bold;color:#ffffff;\">\n      ${cliente}\n    </div>\n    <div style=\"margin-top:10px;background:rgba(255,255,255,0.12);border-radius:6px;padding:5px 12px;font-size:12px;color:#d4e8f5;display:inline-block;\">\n      ${dataInicio} – ${dataFim}\n    </div>\n  </div>\n\n  <div class=\"content\" style=\"padding:24px;\">\n\n    <!-- MÉTRICAS -->\n    <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin-bottom:24px;\">\n      <tr>\n        <td class=\"metric\" width=\"25%\" style=\"padding:6px;\">\n          <div style=\"background:#f5f6f8;border-radius:8px;padding:12px;\">\n            <div style=\"font-size:10px;color:#666;text-transform:uppercase;\">Chamados</div>\n            <div style=\"font-size:20px;font-weight:bold;\">${chamados.length}</div>\n          </div>\n        </td>\n\n        <td class=\"metric\" width=\"25%\" style=\"padding:6px;\">\n          <div style=\"background:#f5f6f8;border-radius:8px;padding:12px;\">\n            <div style=\"font-size:10px;color:#666;text-transform:uppercase;\">Horas</div>\n            <div style=\"font-size:20px;font-weight:bold;\">${totalFormatado}</div>\n          </div>\n        </td>\n\n        <td class=\"metric\" width=\"25%\" style=\"padding:6px;\">\n          <div style=\"background:#f5f6f8;border-radius:8px;padding:12px;\">\n            <div style=\"font-size:10px;color:#666;text-transform:uppercase;\">SLA</div>\n            <div style=\"font-size:20px;font-weight:bold;color:${corSLA};\">${pctSLA}%</div>\n          </div>\n        </td>\n\n        <td class=\"metric\" width=\"25%\" style=\"padding:6px;\">\n          <div style=\"background:#f5f6f8;border-radius:8px;padding:12px;\">\n            <div style=\"font-size:10px;color:#666;text-transform:uppercase;\">Violações</div>\n            <div style=\"font-size:20px;font-weight:bold;color:${corViolacoes};\">${violacoes}</div>\n          </div>\n        </td>\n      </tr>\n    </table>\n\n    <!-- CHAMADOS -->\n    <div style=\"font-size:11px;font-weight:bold;color:#666;text-transform:uppercase;margin-bottom:8px;border-bottom:1px solid #e5e7eb;padding-bottom:6px;\">\n      Chamados\n    </div>\n\n    <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" class=\"table\" style=\"font-size:12px;\">\n      <thead>\n        <tr style=\"background:#f9fafb;\">\n          <th style=\"padding:8px;text-align:left;\">ID</th>\n          <th style=\"padding:8px;text-align:left;\">Tipo</th>\n          <th style=\"padding:8px;text-align:left;\">Título</th>\n          <th class=\"hide-mobile\" style=\"padding:8px;text-align:left;\">Categoria</th>\n          <th class=\"hide-mobile\" style=\"padding:8px;text-align:left;\">Analista</th>\n          <th class=\"hide-mobile\" style=\"padding:8px;text-align:left;\">Solução</th>\n          <th class=\"hide-mobile\" style=\"padding:8px;text-align:left;\">Fechamento</th>\n          <th style=\"padding:8px;text-align:left;\">Horas</th>\n        </tr>\n      </thead>\n      <tbody>\n        ${rowsChamados}\n\n        <tr style=\"background:#f5f6f8;\">\n          <td colspan=\"7\" style=\"padding:8px;font-weight:bold;\">Total</td>\n          <td style=\"padding:8px;font-weight:bold;\">${totalFormatado}</td>\n        </tr>\n      </tbody>\n    </table>\n\n    <!-- CATEGORIAS -->\n    <div style=\"font-size:11px;font-weight:bold;color:#666;text-transform:uppercase;margin:20px 0 8px;border-bottom:1px solid #e5e7eb;padding-bottom:6px;\">\n      Categorias\n    </div>\n\n    <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"font-size:12px;\">\n      <thead>\n        <tr style=\"background:#f9fafb;\">\n          <th style=\"padding:8px;text-align:left;\">Categoria</th>\n          <th style=\"padding:8px;text-align:right;\">Horas</th>\n        </tr>\n      </thead>\n      <tbody>\n        ${rowsCategorias}\n      </tbody>\n    </table>\n\n  </div>\n\n  <!-- FOOTER -->\n  <div style=\"padding:14px 24px;border-top:1px solid #e5e7eb;font-size:11px;color:#999;\">\n    Gerado automaticamente em ${dataGeracao}\n  </div>\n\n</div>\n</div>\n\n</body>\n</html>`;\n\nreturn [{ json: { html } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        96
+      ],
+      "id": "d9cbdec7-b7fa-4ec9-94fd-b2ff9dffc02d",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "fromEmail": "automacao@mindworks.com.br",
+        "toEmail": "guilherme.brotto@mindworks.com.br",
+        "subject": "=relatorio",
+        "html": "={{ $json.html }}",
+        "options": {
+          "attachments": ""
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1088,
+        32
+      ],
+      "id": "40607ee2-e3a4-41ca-adb9-f95e61d1fe4f",
+      "name": "Send an Email",
+      "webhookId": "e9e12273-66b9-4461-bcaf-48501e48cc20",
+      "credentials": {
+        "smtp": {
+          "id": "shqS9wQTybpiDBBN",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    COALESCE(ct.completename, 'Sem Categoria') AS Categoria,\n\n    SUM(\n        COALESCE((\n            SELECT SUM(tt.actiontime)\n            FROM glpi_tickettasks tt\n            WHERE tt.tickets_id = t.id\n        ), 0)\n    ) AS Tempo_Total_Segundos,\n\n    SUM(\n        COALESCE((\n            SELECT SUM(tt.actiontime)\n            FROM glpi_tickettasks tt\n            WHERE tt.tickets_id = t.id\n        ), 0)\n    ) / 3600 AS Tempo_Total_Horas,\n\n    SEC_TO_TIME(\n        SUM(\n            COALESCE((\n                SELECT SUM(tt.actiontime)\n                FROM glpi_tickettasks tt\n                WHERE tt.tickets_id = t.id\n            ), 0)\n        )\n    ) AS Tempo_Total_Formatado\n\nFROM glpi_tickets t\n\nLEFT JOIN glpi_itilcategories ct \n    ON t.itilcategories_id = ct.id\n\nWHERE \n    t.is_deleted = 0\n    AND t.entities_id = {{ $json.body.contratoId }}\n    AND t.date BETWEEN '{{ $json.body.dataInicial }}' AND '{{ $json.body.dataFinal }}'\n\nGROUP BY ct.completename\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        368,
+        176
+      ],
+      "id": "8966eae3-04ac-4849-ad4e-7f7ccf90e43f",
+      "name": "Execute a SQL query1",
+      "credentials": {
+        "mySql": {
+          "id": "VdCbZfkse86MeUKQ",
+          "name": "GLPI-Produção"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        624,
+        96
+      ],
+      "id": "efe90ec7-be31-47b5-aa78-51f0aa4b908a",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH t1 as \n  (SELECT id, entities_id, completename\n  FROM glpi_entities  \n  WHERE entities_id IS NOT NULL and completename NOT LIKE '%INATIVOS%'),\n  \nt2 as \n  (SELECT entities_id, name, num\n  FROM glpi_contracts  \n  ),\n\n  t3 as (\n  SELECT t1.id, completename, num AS Horas_Contratadas\n  FROM t1 INNER JOIN t2\n  ON t1.id = t2.entities_id\n  ORDER BY name\n  ),\n\nt4 as (\nSELECT \n    e.id AS id,\n    \n    SUM(\n        COALESCE(tt.actiontime, 0)\n    ) /3600 AS Horas_Trabalhadas\n\nFROM glpi_tickets t\n\nINNER JOIN glpi_entities e \n    ON t.entities_id = e.id\n\nLEFT JOIN glpi_tickettasks tt \n    ON tt.tickets_id = t.id\n\nWHERE \n    t.is_deleted = 0    \n    AND t.date BETWEEN '{{ $json.data_inicio }}' AND '{{ $json.data_fim }}'\n\nGROUP BY e.id\n\n),\n\nt5 as (\nSELECT \n  id, \n  TRIM(SUBSTRING_INDEX(completename, '>', -1)) AS name,\n  Horas_Contratadas, \n  Horas_Trabalhadas, \n  Horas_Trabalhadas / Horas_Contratadas * 100 AS Percentual\nFROM t3 NATURAL JOIN t4\nWHERE Horas_Contratadas > 0\nORDER BY id\n)\n\nSELECT *\nFROM t5",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        544,
+        448
+      ],
+      "id": "22d40b96-24c6-4642-abe0-8d64fa36a34e",
+      "name": "Execute a SQL query2",
+      "credentials": {
+        "mySql": {
+          "id": "N8HuXhUMGtlUWrBt",
+          "name": "GLPI-Homologação"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        832,
+        448
+      ],
+      "id": "41bef72f-0715-4ff8-be21-747dc9da229f",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"id_contrato\": 163,\n  \"data_inicio\": \"2026-04-01 00:00:00\",\n  \"data_fim\": \"2026-04-31 23:59:59\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        336,
+        448
+      ],
+      "id": "25a87052-bcf5-4215-9ca1-9482e0e42e02",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        112,
+        448
+      ],
+      "id": "22b323ef-c53b-48cd-b457-6503d769b729",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH t1 as \n  (SELECT id, entities_id, completename\n  FROM glpi_entities  \n  WHERE entities_id IS NOT NULL and completename NOT LIKE '%INATIVOS%'),\n  \nt2 as \n  (SELECT entities_id, name, num\n  FROM glpi_contracts  \n  ),\n\n  t3 as (\n  SELECT t1.id, name, completename, num AS Horas_Contratadas\n  FROM t1 INNER JOIN t2\n  ON t1.id = t2.entities_id\n  ORDER BY name\n  ),\n\nt4 as (\nSELECT \n    e.id AS id,\n    \n    SUM(\n        COALESCE(tt.actiontime, 0)\n    ) /3600 AS Horas_Trabalhadas\n\nFROM glpi_tickets t\n\nINNER JOIN glpi_entities e \n    ON t.entities_id = e.id\n\nLEFT JOIN glpi_tickettasks tt \n    ON tt.tickets_id = t.id\n\nWHERE \n    t.is_deleted = 0    \n    AND t.date BETWEEN '{{ $json.data_inicio }}' AND '{{ $json.data_fim }}'\n\nGROUP BY e.id\n\n),\n\nt5 as (\nSELECT id, name, completename, Horas_Contratadas, Horas_Trabalhadas\nFROM t3 NATURAL JOIN t4\nWHERE Horas_Contratadas > 0\nORDER BY id\n)\n\nSELECT *\nFROM t5",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        528,
+        816
+      ],
+      "id": "0fc01147-3712-4c44-9d96-d4496d632233",
+      "name": "Execute a SQL query4",
+      "credentials": {
+        "mySql": {
+          "id": "N8HuXhUMGtlUWrBt",
+          "name": "GLPI-Homologação"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={  \n  \"data_inicio\": {{ $json.body.dataInicial }},\n  \"data_fim\": {{ $json.body.dataFinal }}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        320,
+        816
+      ],
+      "id": "6060f443-083a-4907-b8b5-b8c0535601e3",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const formatarDataHora = (data) => {\n  if (!data) return '-';\n  const d = new Date(data);\n  return d.toLocaleDateString('pt-BR');\n};\n\nconst items = $input.all();\nconst dataInicio = formatarDataHora($('Edit Fields3').first().json.data_inicio)\nconst dataFim = formatarDataHora($('Edit Fields3').first().json.data_fim)\nconst dataGeracao = new Date().toLocaleString('pt-BR');\n\n// Função para pegar apenas o último nome do completename\nfunction getNome(completename) {\n  if (!completename) return '-';\n  const partes = completename.split('>');\n  return partes[partes.length - 1].trim();\n}\n\n// Formatar horas (ex: 2.3333 → 02:20)\nfunction formatarHoras(decimal) {\n  const horas = Math.floor(decimal);\n  const minutos = Math.round((decimal - horas) * 60);\n  return `${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}`;\n}\n\nlet totalContratadas = 0;\nlet totalTrabalhadas = 0;\n\nlet rows = '';\n\nfor (const item of items) {\n  const nome = getNome(item.json.completename);\n  const horasContratadas = Number(item.json.Horas_Contratadas || 0);\n  const horasTrabalhadas = Number(item.json.Horas_Trabalhadas || 0);\n\n  totalContratadas += horasContratadas;\n  totalTrabalhadas += horasTrabalhadas;\n\n  const percentual = horasContratadas > 0\n    ? ((horasTrabalhadas / horasContratadas) * 100).toFixed(1)\n    : '0.0';\n\n  const corPercentual =\n    percentual >= 100 ? '#c0392b' :\n    percentual >= 80 ? '#f39c12' :\n    '#0F6E56';\n\n  rows += `\n    <tr>\n      <td style=\"padding:8px;border-bottom:1px solid #e5e7eb;\">\n        ${nome}\n      </td>\n\n      <td style=\"padding:8px;border-bottom:1px solid #e5e7eb;text-align:right;\">\n        ${formatarHoras(horasContratadas)}\n      </td>\n\n      <td style=\"padding:8px;border-bottom:1px solid #e5e7eb;text-align:right;\">\n        ${formatarHoras(horasTrabalhadas)}\n      </td>\n\n      <td style=\"padding:8px;border-bottom:1px solid #e5e7eb;text-align:right;font-weight:bold;color:${corPercentual};\">\n        ${percentual}%\n      </td>\n    </tr>\n  `;\n}\n\nconst totalPercentual = totalContratadas > 0\n  ? ((totalTrabalhadas / totalContratadas) * 100).toFixed(1)\n  : '0.0';\n\nconst corTotal =\n  totalPercentual >= 100 ? '#c0392b' :\n  totalPercentual >= 80 ? '#f39c12' :\n  '#0F6E56';\n\nconst html = `<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<style>\n  body { margin:0; padding:0; background:#f0f2f5; font-family:Arial,sans-serif; }\n\n  @media only screen and (max-width: 600px) {\n    .container { padding: 0 8px !important; }\n    .content { padding: 16px !important; }\n    .hide-mobile { display: none !important; }\n    .table td, .table th { font-size: 11px !important; padding: 6px !important; }\n    .metric { display:block !important; width:100% !important; margin-bottom:10px; }\n  }\n</style>\n</head>\n\n<body>\n\n<div class=\"container\" style=\"max-width:720px;margin:24px auto;padding:0 12px;\">\n<div style=\"background:#fff;border-radius:10px;border:1px solid #e5e7eb;overflow:hidden;\">\n\n  <!-- HEADER -->\n  <div style=\"background:#1a3a5c;padding:20px;color:#fff;\">\n    <div style=\"font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#7eadd4;\">\n      Relatório de Horas\n    </div>\n    <div style=\"font-size:18px;font-weight:bold;margin-top:4px;\">\n      Horas por Cliente\n    </div>\n    <div style=\"margin-top:8px;font-size:12px;color:#d4e8f5;\">\n      ${dataInicio} – ${dataFim}\n    </div>\n  </div>\n\n  <div class=\"content\" style=\"padding:20px;\">\n\n\n\n    <!-- TABELA -->\n    <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" class=\"table\" style=\"font-size:12px;\">\n      <thead>\n        <tr style=\"background:#f9fafb;\">\n          <th style=\"padding:8px;text-align:left;\">Cliente</th>\n          <th style=\"padding:8px;text-align:right;\">Contratadas</th>\n          <th style=\"padding:8px;text-align:right;\">Trabalhadas</th>\n          <th style=\"padding:8px;text-align:right;\">%</th>\n        </tr>\n      </thead>\n      <tbody>\n        ${rows}\n\n        <tr style=\"background:#f5f6f8;\">\n          <td style=\"padding:8px;font-weight:bold;\">Total</td>\n          <td style=\"padding:8px;text-align:right;font-weight:bold;\">\n            ${formatarHoras(totalContratadas)}\n          </td>\n          <td style=\"padding:8px;text-align:right;font-weight:bold;\">\n            ${formatarHoras(totalTrabalhadas)}\n          </td>\n          <td style=\"padding:8px;text-align:right;font-weight:bold;color:${corTotal};\">\n            ${totalPercentual}%\n          </td>\n        </tr>\n      </tbody>\n    </table>\n\n  </div>\n\n  <!-- FOOTER -->\n  <div style=\"padding:12px 20px;border-top:1px solid #e5e7eb;font-size:11px;color:#999;\">\n    Gerado automaticamente em ${dataGeracao}\n  </div>\n\n</div>\n</div>\n\n</body>\n</html>`;\n\n\nreturn [\n  {\n    json: {\n      html\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        816
+      ],
+      "id": "fd4c5f38-fcfb-44bf-83a7-1782c115f450",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "fromEmail": "automacao@mindworks.com.br",
+        "toEmail": "guilherme.brotto@mindworks.com.br",
+        "subject": "Relatório Horas Trabalhadas Por Cliente",
+        "html": "={{ $json.html }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1104,
+        752
+      ],
+      "id": "4cf0de9f-c5ae-4392-8723-41976ea365de",
+      "name": "Send an Email6",
+      "webhookId": "bd044437-e179-4a70-a892-d7439c4127a4",
+      "credentials": {
+        "smtp": {
+          "id": "shqS9wQTybpiDBBN",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Relatório INTERNO MINDWORKS relatando horas trabalhadas por cliente"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -192,
+        816
+      ],
+      "typeVersion": 1,
+      "id": "913b716c-7b46-4332-a641-f18091e248ea",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Relatório para clientes informando % de horas trabalhadas em relação ao total do contrato. "
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -192,
+        448
+      ],
+      "typeVersion": 1,
+      "id": "e17203fe-527b-4c5c-b178-2abb898a7f63",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "Relatório para cliente específico, informando todos os chamados realizados, violações e horas por categoria."
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -208,
+        16
+      ],
+      "typeVersion": 1,
+      "id": "a5893395-7402-4f07-a53a-0a03a8c01e4f",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "relatorio-geral",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        112,
+        816
+      ],
+      "id": "defab49f-275c-4db3-9b1e-b289ce28d487",
+      "name": "Webhook",
+      "webhookId": "527c9bae-0857-4b12-af3a-883a730925d7"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "relatorio-cliente",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        80,
+        32
+      ],
+      "id": "c28339d8-c058-402b-a7eb-8af4363d8947",
+      "name": "Webhook1",
+      "webhookId": "527c9bae-0857-4b12-af3a-883a730925d7"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.html }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1088,
+        208
+      ],
+      "id": "7b61a129-23dd-4c82-b7b2-95370447bc1f",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.html }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1104,
+        928
+      ],
+      "id": "50881116-1495-45a3-a942-5429b71934d7",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lista-clientes",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        128,
+        1184
+      ],
+      "id": "052bbe1c-4791-4454-8c25-981d335e3995",
+      "name": "Webhook2",
+      "webhookId": "14198214-7774-4302-b430-8e98cb0a7c4e"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, name\nFROM glpi_entities",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        336,
+        1184
+      ],
+      "id": "29407723-4659-4e8a-bb5c-da4a3a7f3df4",
+      "name": "Execute a SQL query5",
+      "credentials": {
+        "mySql": {
+          "id": "N8HuXhUMGtlUWrBt",
+          "name": "GLPI-Homologação"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "automacao@mindworks.com.br",
+        "toEmail": "a@mindworks.com.br",
+        "subject": "Informativo Horas Trabalhadas ",
+        "html": "=<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"UTF-8\" />\n  <title>Relatório de Horas</title>\n</head>\n\n<body style=\"margin:0; padding:0; background-color:#f4f6f8; font-family: Arial, sans-serif;\">\n\n  <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color:#f4f6f8; padding:20px 0;\">\n    <tr>\n      <td align=\"center\">\n\n        <!-- Container -->\n        <table width=\"600\" cellpadding=\"0\" cellspacing=\"0\" style=\"background:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.1);\">\n\n          <!-- Header -->\n          <tr>\n            <td style=\"background:#0b3d91; padding:20px; text-align:center; color:#ffffff;\">\n              <h2 style=\"margin:0;\">Relatório de Horas</h2>\n              <p style=\"margin:5px 0 0 0; font-size:14px; opacity:0.9;\">\n                Monitoramento de utilização contratada\n              </p>\n            </td>\n          </tr>\n\n          <!-- Conteúdo -->\n          <tr>\n            <td style=\"padding:30px; color:#333;\">\n\n              <p style=\"font-size:16px;\">\n                Olá,\n              </p>\n\n              <p style=\"font-size:15px; line-height:1.5;\">\n                Segue abaixo o resumo de utilização de horas do cliente:\n              </p>\n\n              <!-- Card de informações -->\n              <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin-top:20px; border:1px solid #e0e0e0; border-radius:6px;\">\n                \n                <tr style=\"background:#f0f4ff;\">\n                  <td style=\"padding:12px; font-weight:bold;\">Cliente</td>\n                  <td style=\"padding:12px;\">{{$json.name}}</td>\n                </tr>\n\n                <tr>\n                  <td style=\"padding:12px; font-weight:bold;\">Horas Contratadas</td>\n                  <td style=\"padding:12px;\">{{$json.Horas_Contratadas}}</td>\n                </tr>\n\n                <tr style=\"background:#f9fafc;\">\n                  <td style=\"padding:12px; font-weight:bold;\">Horas Trabalhadas</td>\n                  <td style=\"padding:12px;\">{{$json.Horas_Trabalhadas}}</td>\n                </tr>\n\n                <tr>\n                  <td style=\"padding:12px; font-weight:bold;\">Utilização</td>\n                  <td style=\"padding:12px; font-weight:bold; color:#0b3d91;\">\n                    {{ ($json.Percentual).toFixed(2) }}%\n                  </td>\n                </tr>\n\n              </table>\n\n              <!-- Destaque -->\n              <div style=\"margin-top:25px; padding:15px; background:#f0f4ff; border-left:4px solid #0b3d91; border-radius:4px;\">\n                <p style=\"margin:0; font-size:14px;\">\n                  Este percentual representa o quanto das horas contratadas já foram utilizadas até o momento.\n                </p>\n              </div>\n\n              <p style=\"margin-top:25px; font-size:14px;\">\n                Caso tenha dúvidas ou precise de mais detalhes, estamos à disposição.\n              </p>\n\n            </td>\n          </tr>\n\n          <!-- Footer -->\n          <tr>\n            <td style=\"background:#f4f6f8; padding:15px; text-align:center; font-size:12px; color:#777;\">\n              © {{ new Date().getFullYear() }} Mindworks<br>\n              Email automático - não responder\n            </td>\n          </tr>\n\n        </table>\n\n      </td>\n    </tr>\n  </table>\n\n</body>\n</html>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1104,
+        464
+      ],
+      "id": "23394b29-428e-4082-a208-858401653a28",
+      "name": "Send an Email1",
+      "webhookId": "76b4e013-fd9a-4677-8741-faa12706228e",
+      "credentials": {
+        "smtp": {
+          "id": "shqS9wQTybpiDBBN",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Ajustes de UX/UI",
+        "height": 80,
+        "width": 160,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -432,
+        464
+      ],
+      "typeVersion": 1,
+      "id": "5022a7c5-72dd-443b-a121-fcebaea4b1f2",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "\n",
+        "height": 464,
+        "width": 1264,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        64,
+        -112
+      ],
+      "typeVersion": 1,
+      "id": "abdf8c38-0971-4df8-a5cf-fca5f55bd976",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "\n",
+        "height": 384,
+        "width": 1264,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        64,
+        688
+      ],
+      "typeVersion": 1,
+      "id": "5187f9f2-07f0-40a9-84eb-e8d7f71c10fe",
+      "name": "Sticky Note5"
+    }
+  ],
+  "pinData": {
+    "Webhook2": [
+      {
+        "json": {
+          "name": "First item",
+          "code": 1
+        }
+      },
+      {
+        "json": {
+          "name": "Second item",
+          "code": 2
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        []
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query4": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send an Email6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook2": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query5": {
+      "main": [
+        []
+      ]
+    },
+    "Send an Email1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "787e6d34-adc6-4f2d-9ccd-6427e224822c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "538d7c13b97acb108c5ddc9c6eb421845f4a8e665091d79e7a1d8970a4748c78"
+  },
+  "nodeGroups": [],
+  "id": "PoJR3ojPZeTtTXim",
+  "tags": []
+}

@@ -1,0 +1,77 @@
+{#
+ # PDF-only markup. Kept deliberately flat (no wrapper divs, no border-radius,
+ # explicit column widths) because TCPDF's HTML engine only renders simple
+ # tables reliably. The page chrome is drawn natively in ReportPdfDocument.
+ #}
+<table width="100%" cellpadding="2" cellspacing="0">
+  <tr>
+    <td width="100%" style="border-bottom:0.6pt solid #cbd5e1;color:#5b6674;font-size:7.5pt;"><b>CHAMADOS</b></td>
+  </tr>
+</table>
+
+<table width="100%" cellpadding="3" cellspacing="0" style="font-size:7pt;">
+  <thead>
+    <tr style="background-color:#1a3a5c;color:#ffffff;">
+      <th width="5%" align="left">ID</th>
+      <th width="10%" align="left">Tipo</th>
+      <th width="25%" align="left">Título</th>
+      <th width="17%" align="left">Categoria</th>
+      <th width="13%" align="left">Analista</th>
+      <th width="11%" align="left">Solução</th>
+      <th width="11%" align="left">Fechamento</th>
+      <th width="8%" align="right">Horas</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for ticket in tickets %}
+    <tr style="background-color:{{ loop.index is odd ? '#ffffff' : '#f7f8fa' }};">
+      <td width="5%" align="left">{{ ticket.id }}</td>
+      <td width="10%" align="left" style="color:{{ ticket.tipo == 'Incidente' ? '#993c1d' : '#185fa5' }};"><b>{{ ticket.tipo }}</b></td>
+      <td width="25%" align="left">{{ ticket.titulo|default('-') }}</td>
+      <td width="17%" align="left">{{ ticket.categoria }}</td>
+      <td width="13%" align="left">{{ ticket.tecnico }}</td>
+      <td width="11%" align="left">{{ ticket.data_solucao_fmt }}</td>
+      <td width="11%" align="left">{{ ticket.data_fechamento_fmt }}</td>
+      <td width="8%" align="right">{{ ticket.tempo_trabalhado_formatado }}</td>
+    </tr>
+    {% else %}
+    <tr>
+      <td width="100%" colspan="8" align="center" style="color:#94a3b8;">Nenhum chamado registrado no período.</td>
+    </tr>
+    {% endfor %}
+
+    <tr style="background-color:#1a3a5c;color:#ffffff;">
+      <td width="92%" colspan="7" align="left"><b>Total</b></td>
+      <td width="8%" align="right"><b>{{ total_trabalhado_formatado }}</b></td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<table width="100%" cellpadding="2" cellspacing="0">
+  <tr>
+    <td width="100%" style="border-bottom:0.6pt solid #cbd5e1;color:#5b6674;font-size:7.5pt;"><b>HORAS POR CATEGORIA</b></td>
+  </tr>
+</table>
+
+<table width="100%" cellpadding="3" cellspacing="0" style="font-size:7.5pt;">
+  <thead>
+    <tr style="background-color:#1a3a5c;color:#ffffff;">
+      <th width="80%" align="left">Categoria</th>
+      <th width="20%" align="right">Horas</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for category in categories %}
+    <tr style="background-color:{{ loop.index is odd ? '#ffffff' : '#f7f8fa' }};">
+      <td width="80%" align="left">{{ category.categoria }}</td>
+      <td width="20%" align="right">{{ category.tempo_total_formatado }}</td>
+    </tr>
+    {% else %}
+    <tr>
+      <td width="100%" colspan="2" align="center" style="color:#94a3b8;">Nenhuma categoria no período.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

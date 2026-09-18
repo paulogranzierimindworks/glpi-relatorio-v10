@@ -1,0 +1,106 @@
+{#
+ # On-screen general report (contracted vs. worked hours). Same rules as
+ # report_client.html.twig: a fragment built from GLPI's own Tabler components.
+ #}
+
+{% include '@relatorioglpicomercial/_report_header.html.twig' with {
+   'eyebrow': __('Relatório de Horas', 'relatorioglpicomercial'),
+   'title': __('Horas por Cliente', 'relatorioglpicomercial'),
+   'date_start_fmt': date_start_fmt,
+   'date_end_fmt': date_end_fmt,
+   'pdf_url': pdf_url,
+} only %}
+
+<div class="row row-cards mb-3">
+   <div class="col-12 col-lg-4">
+      <div class="card card-sm">
+         <div class="card-body">
+            <div class="subheader">{{ __('Clientes', 'relatorioglpicomercial') }}</div>
+            <div class="h1 m-0">{{ rows|length }}</div>
+         </div>
+      </div>
+   </div>
+
+   <div class="col-6 col-lg-4">
+      <div class="card card-sm">
+         <div class="card-body">
+            <div class="subheader">{{ __('Contratadas', 'relatorioglpicomercial') }}</div>
+            <div class="h1 m-0">{{ total_contratadas_fmt }}</div>
+         </div>
+      </div>
+   </div>
+
+   <div class="col-6 col-lg-4">
+      <div class="card card-sm">
+         <div class="card-body">
+            <div class="subheader">{{ __('Trabalhadas', 'relatorioglpicomercial') }}</div>
+            <div class="h1 m-0 {{ total_percentual_css }}">{{ total_trabalhadas_fmt }}</div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<div class="card mb-3">
+   <div class="card-header">
+      <h3 class="card-title">
+         <i class="ti ti-clock-hour-4 me-2"></i>{{ __('Horas contratadas x trabalhadas', 'relatorioglpicomercial') }}
+      </h3>
+   </div>
+
+   <div class="table-responsive">
+      <table class="table table-hover card-table">
+         <thead>
+            <tr>
+               <th>{{ __('Cliente', 'relatorioglpicomercial') }}</th>
+               <th class="text-end">{{ __('Contratadas', 'relatorioglpicomercial') }}</th>
+               <th class="text-end">{{ __('Trabalhadas', 'relatorioglpicomercial') }}</th>
+               <th class="text-end">{{ __('Consumo', 'relatorioglpicomercial') }}</th>
+               <th class="d-none d-md-table-cell" style="width: 14%;"></th>
+            </tr>
+         </thead>
+         <tbody>
+            {% for row in rows %}
+               <tr>
+                  <td>
+                     {% if can_link_item %}
+                        <a href="{{ 'Entity'|itemtype_form_path(row.entities_id) }}">{{ row.nome }}</a>
+                     {% else %}
+                        {{ row.nome }}
+                     {% endif %}
+                  </td>
+                  <td class="text-end text-nowrap">{{ row.horas_contratadas_fmt }}</td>
+                  <td class="text-end text-nowrap">{{ row.horas_trabalhadas_fmt }}</td>
+                  <td class="text-end text-nowrap fw-bold {{ row.percentual_css }}">{{ row.percentual_fmt }}%</td>
+                  <td class="d-none d-md-table-cell">
+                     <div class="progress progress-sm" role="progressbar"
+                          aria-valuenow="{{ row.percentual_fmt }}" aria-valuemin="0" aria-valuemax="100"
+                          aria-label="{{ row.nome }}">
+                        <div class="progress-bar {{ row.percentual_css|replace({'text-': 'bg-'}) }}"
+                             style="width: {{ min(row.percentual, 100) }}%;"></div>
+                     </div>
+                  </td>
+               </tr>
+            {% else %}
+               <tr>
+                  <td colspan="5" class="text-center text-secondary py-4">
+                     {{ __('Nenhum cliente com contrato no período.', 'relatorioglpicomercial') }}
+                  </td>
+               </tr>
+            {% endfor %}
+         </tbody>
+         <tfoot>
+            <tr class="table-active fw-bold">
+               <td>{{ __('Total', 'relatorioglpicomercial') }}</td>
+               <td class="text-end text-nowrap">{{ total_contratadas_fmt }}</td>
+               <td class="text-end text-nowrap">{{ total_trabalhadas_fmt }}</td>
+               <td class="text-end text-nowrap {{ total_percentual_css }}">{{ total_percentual_fmt }}%</td>
+               <td class="d-none d-md-table-cell"></td>
+            </tr>
+         </tfoot>
+      </table>
+   </div>
+</div>
+
+<p class="text-secondary small">
+   {{ __('Gerado automaticamente em', 'relatorioglpicomercial') }} {{ generated_at }}
+</p>

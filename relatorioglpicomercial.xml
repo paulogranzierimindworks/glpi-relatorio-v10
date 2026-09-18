@@ -1,0 +1,36 @@
+<root>
+   <name>Relatorio Comercial</name>
+   <key>relatorioglpicomercial</key>
+   <!-- stable, beta, development, alpha, ... -->
+   <state>development</state>
+   <logo>https://raw.githubusercontent.com/pluginsGLPI/relatorioglpicomercial/main/relatorioglpicomercial.png</logo>
+   <description>
+      <short>
+         <en>Commercial reports for GLPI</en>
+         <fr>Rapports commerciaux pour GLPI</fr>
+      </short>
+      <long>
+         <en>Displays per-client ticket/SLA reports and general contracted-vs-worked hours reports, with PDF export.</en>
+         <fr>Affiche les rapports de tickets/SLA par client et les rapports d'heures contractuelles, avec export PDF.</fr>
+      </long>
+   </description>
+   <homepage>https://github.com/pluginsGLPI/relatorioglpicomercial</homepage>
+   <download>https://github.com/pluginsGLPI/relatorioglpicomercial/releases</download>
+   <issues>https://github.com/pluginsGLPI/relatorioglpicomercial/issues</issues>
+   <readme>https://github.com/pluginsGLPI/relatorioglpicomercial/blob/main/README.md</readme>
+   <authors>
+      <author>Mindworks</author>
+   </authors>
+   <versions>
+      <version>
+         <num>1.0.0</num>
+         <compatibility>~11.0.0</compatibility>
+      </version>
+   </versions>
+   <langs>
+      <lang>en_GB</lang>
+      <lang>fr_FR</lang>
+      <lang>pt_BR</lang>
+   </langs>
+   <license>MIT</license>
+</root>

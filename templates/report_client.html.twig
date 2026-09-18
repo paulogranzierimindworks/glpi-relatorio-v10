@@ -1,0 +1,152 @@
+{#
+ # On-screen per-client report. Rendered inline inside a regular GLPI page, so
+ # it is a fragment (no <html>, no <style>) built from the Tabler components
+ # GLPI already ships: cards, card-table, badges and utility classes.
+ # The PDF export has its own markup under templates/pdf/.
+ #}
+
+{% include '@relatorioglpicomercial/_report_header.html.twig' with {
+   'eyebrow': __('Relatório Comercial', 'relatorioglpicomercial'),
+   'title': entity.name|default(__('Cliente', 'relatorioglpicomercial')),
+   'date_start_fmt': date_start_fmt,
+   'date_end_fmt': date_end_fmt,
+   'pdf_url': pdf_url,
+} only %}
+
+<div class="row row-cards mb-3">
+   <div class="col-6 col-lg-3">
+      <div class="card card-sm">
+         <div class="card-body">
+            <div class="subheader">{{ __('Chamados', 'relatorioglpicomercial') }}</div>
+            <div class="h1 m-0">{{ tickets|length }}</div>
+         </div>
+      </div>
+   </div>
+
+   <div class="col-6 col-lg-3">
+      <div class="card card-sm">
+         <div class="card-body">
+            <div class="subheader">{{ __('Horas', 'relatorioglpicomercial') }}</div>
+            <div class="h1 m-0">{{ total_trabalhado_formatado }}</div>
+         </div>
+      </div>
+   </div>
+
+   <div class="col-6 col-lg-3">
+      <div class="card card-sm">
+         <div class="card-body">
+            <div class="subheader">{{ __('SLA', 'relatorioglpicomercial') }}</div>
+            <div class="h1 m-0 {{ sla_css }}">{{ sla_percentual_fmt }}%</div>
+         </div>
+      </div>
+   </div>
+
+   <div class="col-6 col-lg-3">
+      <div class="card card-sm">
+         <div class="card-body">
+            <div class="subheader">{{ __('Violações', 'relatorioglpicomercial') }}</div>
+            <div class="h1 m-0 {{ violacoes_css }}">{{ violacoes }}</div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<div class="card mb-3">
+   <div class="card-header">
+      <h3 class="card-title">
+         <i class="ti ti-ticket me-2"></i>{{ __('Chamados', 'relatorioglpicomercial') }}
+      </h3>
+   </div>
+
+   <div class="table-responsive">
+      <table class="table table-hover card-table">
+         <thead>
+            <tr>
+               <th>{{ __('ID', 'relatorioglpicomercial') }}</th>
+               <th>{{ __('Tipo', 'relatorioglpicomercial') }}</th>
+               <th>{{ __('Título', 'relatorioglpicomercial') }}</th>
+               <th class="d-none d-md-table-cell">{{ __('Categoria', 'relatorioglpicomercial') }}</th>
+               <th class="d-none d-md-table-cell">{{ __('Analista', 'relatorioglpicomercial') }}</th>
+               <th class="d-none d-lg-table-cell">{{ __('Solução', 'relatorioglpicomercial') }}</th>
+               <th class="d-none d-lg-table-cell">{{ __('Fechamento', 'relatorioglpicomercial') }}</th>
+               <th class="text-end">{{ __('Horas', 'relatorioglpicomercial') }}</th>
+            </tr>
+         </thead>
+         <tbody>
+            {% for ticket in tickets %}
+               <tr>
+                  <td>
+                     {% if can_link_item %}
+                        <a href="{{ 'Ticket'|itemtype_form_path(ticket.id) }}">{{ ticket.id }}</a>
+                     {% else %}
+                        {{ ticket.id }}
+                     {% endif %}
+                  </td>
+                  <td>
+                     {% if ticket.tipo == 'Incidente' %}
+                        <span class="badge bg-orange-lt">{{ __('Incidente', 'relatorioglpicomercial') }}</span>
+                     {% else %}
+                        <span class="badge bg-blue-lt">{{ __('Requisição', 'relatorioglpicomercial') }}</span>
+                     {% endif %}
+                  </td>
+                  <td>{{ ticket.titulo|default('-') }}</td>
+                  <td class="d-none d-md-table-cell">{{ ticket.categoria }}</td>
+                  <td class="d-none d-md-table-cell">{{ ticket.tecnico }}</td>
+                  <td class="d-none d-lg-table-cell text-nowrap">{{ ticket.data_solucao_fmt }}</td>
+                  <td class="d-none d-lg-table-cell text-nowrap">{{ ticket.data_fechamento_fmt }}</td>
+                  <td class="text-end text-nowrap">{{ ticket.tempo_trabalhado_formatado }}</td>
+               </tr>
+            {% else %}
+               <tr>
+                  <td colspan="8" class="text-center text-secondary py-4">
+                     {{ __('Nenhum chamado registrado no período.', 'relatorioglpicomercial') }}
+                  </td>
+               </tr>
+            {% endfor %}
+         </tbody>
+         <tfoot>
+            <tr class="table-active fw-bold">
+               <td colspan="7">{{ __('Total', 'relatorioglpicomercial') }}</td>
+               <td class="text-end text-nowrap">{{ total_trabalhado_formatado }}</td>
+            </tr>
+         </tfoot>
+      </table>
+   </div>
+</div>
+
+<div class="card mb-3">
+   <div class="card-header">
+      <h3 class="card-title">
+         <i class="ti ti-category me-2"></i>{{ __('Horas por categoria', 'relatorioglpicomercial') }}
+      </h3>
+   </div>
+
+   <div class="table-responsive">
+      <table class="table table-hover card-table">
+         <thead>
+            <tr>
+               <th>{{ __('Categoria', 'relatorioglpicomercial') }}</th>
+               <th class="text-end">{{ __('Horas', 'relatorioglpicomercial') }}</th>
+            </tr>
+         </thead>
+         <tbody>
+            {% for category in categories %}
+               <tr>
+                  <td>{{ category.categoria }}</td>
+                  <td class="text-end text-nowrap">{{ category.tempo_total_formatado }}</td>
+               </tr>
+            {% else %}
+               <tr>
+                  <td colspan="2" class="text-center text-secondary py-4">
+                     {{ __('Nenhuma categoria no período.', 'relatorioglpicomercial') }}
+                  </td>
+               </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+   </div>
+</div>
+
+<p class="text-secondary small">
+   {{ __('Gerado automaticamente em', 'relatorioglpicomercial') }} {{ generated_at }}
+</p>
