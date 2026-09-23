@@ -11,17 +11,21 @@
 
 namespace GlpiPlugin\Relatorioglpicomercial;
 
+use Auth;
 use Contract;
 use DateInterval;
 use DateTime;
 use Entity;
 use Glpi\Console\AbstractCommand;
 use ITILCategory;
+use Session;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Ticket;
 use TicketTask;
+use User;
 
 /**
  * Creates (or resets) sample entities, contracts, categories and tickets so
@@ -118,6 +122,35 @@ class SeedDemoDataCommand extends AbstractCommand
         );
 
         return 0;
+    }
+
+    /**
+     * Load a user in session, so add() calls have an active profile/entities.
+     *
+     * GLPI 10's Glpi\Console\AbstractCommand has no such helper (it was added
+     * later); this mirrors the private method of the same name in core's
+     * Glpi\Console\Plugin\InstallCommand.
+     */
+    private function loadUserSession(string $username): void
+    {
+        $user = new User();
+        if (!$user->getFromDBbyName($username)) {
+            throw new InvalidArgumentException(
+                __('User name defined by --username option is invalid.')
+            );
+        }
+
+        $lang = $_SESSION['glpilanguage'];
+        $session_use_mode = $_SESSION['glpi_use_mode'];
+
+        $auth = new Auth();
+        $auth->auth_succeded = true;
+        $auth->user = $user;
+        Session::init($auth);
+
+        $_SESSION['glpilanguage'] = $lang;
+        $_SESSION['glpi_use_mode'] = $session_use_mode;
+        Session::loadLanguage();
     }
 
     private function purge(OutputInterface $output): void

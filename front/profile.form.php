@@ -9,6 +9,8 @@
  * -------------------------------------------------------------------------
  */
 
+include('../../../inc/includes.php');
+
 use GlpiPlugin\Relatorioglpicomercial\Report;
 
 Session::checkRight('profile', UPDATE);

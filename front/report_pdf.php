@@ -9,7 +9,8 @@
  * -------------------------------------------------------------------------
  */
 
-use Glpi\Exception\Http\BadRequestHttpException;
+include('../../../inc/includes.php');
+
 use GlpiPlugin\Relatorioglpicomercial\Report;
 use GlpiPlugin\Relatorioglpicomercial\ReportPdf;
 
@@ -20,13 +21,13 @@ $date_start = (string) ($_GET['date_start'] ?? '');
 $date_end   = (string) ($_GET['date_end'] ?? '');
 
 if (!Report::isValidDate($date_start) || !Report::isValidDate($date_end) || $date_start > $date_end) {
-    throw new BadRequestHttpException('Invalid date range');
+    Html::displayErrorAndDie('Invalid date range');
 }
 
 if ($tipo === 'cliente') {
     $entities_id = (int) ($_GET['entities_id'] ?? 0);
     if (!Report::entityExists($entities_id)) {
-        throw new BadRequestHttpException('Invalid entity');
+        Html::displayErrorAndDie('Invalid entity');
     }
 
     $tickets    = Report::getTicketsForEntity($entities_id, $date_start, $date_end);
@@ -39,5 +40,5 @@ if ($tipo === 'cliente') {
 
     ReportPdf::streamGeneralReport($rows, $date_start, $date_end);
 } else {
-    throw new BadRequestHttpException('Invalid "tipo" parameter');
+    Html::displayErrorAndDie('Invalid "tipo" parameter');
 }

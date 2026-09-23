@@ -31,7 +31,6 @@
  * -------------------------------------------------------------------------
  */
 
-use Glpi\DBAL\QueryExpression;
 use GlpiPlugin\Relatorioglpicomercial\EntityMailConfig;
 use GlpiPlugin\Relatorioglpicomercial\MailConfig;
 use GlpiPlugin\Relatorioglpicomercial\Report;

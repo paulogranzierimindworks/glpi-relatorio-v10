@@ -13,7 +13,7 @@ namespace GlpiPlugin\Relatorioglpicomercial;
 
 use DateTime;
 use Entity;
-use Glpi\DBAL\QueryExpression;
+use QueryExpression;
 
 /**
  * Builds the data used by the two commercial reports (per-client tickets/SLA
@@ -70,7 +70,7 @@ class Report
                 'glpi_tickets.solvedate AS data_solucao',
                 'glpi_tickets.closedate AS data_fechamento',
                 'glpi_itilcategories.completename AS categoria',
-                new QueryExpression('COALESCE(SUM(glpi_tickettasks.actiontime), 0)', 'tempo_trabalhado_segundos'),
+                new QueryExpression('COALESCE(SUM(glpi_tickettasks.actiontime), 0) AS tempo_trabalhado_segundos'),
             ],
             'FROM'       => 'glpi_tickets',
             'LEFT JOIN'  => [
@@ -122,7 +122,7 @@ class Report
             'SELECT'     => [
                 'glpi_tickets_users.tickets_id',
                 'glpi_tickets_users.type',
-                new QueryExpression("CONCAT(glpi_users.firstname, ' ', glpi_users.realname)", 'nome'),
+                new QueryExpression("CONCAT(glpi_users.firstname, ' ', glpi_users.realname) AS nome"),
             ],
             'FROM'       => 'glpi_tickets_users',
             'INNER JOIN' => [
@@ -241,7 +241,7 @@ class Report
         $workedIterator = $DB->request([
             'SELECT'     => [
                 'glpi_tickets.entities_id',
-                new QueryExpression('SUM(COALESCE(glpi_tickettasks.actiontime, 0)) / 3600', 'horas_trabalhadas'),
+                new QueryExpression('SUM(COALESCE(glpi_tickettasks.actiontime, 0)) / 3600 AS horas_trabalhadas'),
             ],
             'FROM'       => 'glpi_tickets',
             'LEFT JOIN'  => [

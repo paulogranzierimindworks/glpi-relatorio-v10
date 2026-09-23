@@ -9,6 +9,8 @@
  * -------------------------------------------------------------------------
  */
 
+include('../../../inc/includes.php');
+
 use GlpiPlugin\Relatorioglpicomercial\Menu;
 use GlpiPlugin\Relatorioglpicomercial\Report;
 use GlpiPlugin\Relatorioglpicomercial\ReportRenderer;

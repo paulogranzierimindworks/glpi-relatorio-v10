@@ -36,11 +36,21 @@ define('PLUGIN_RELATORIOGLPICOMERCIAL_VERSION', '1.0.0');
 
 // Minimal GLPI version, inclusive
 /** @phpstan-ignore theCodingMachineSafe.function (safe to assume this isn't already defined) */
-define("PLUGIN_RELATORIOGLPICOMERCIAL_MIN_GLPI_VERSION", "11.0.0");
+define("PLUGIN_RELATORIOGLPICOMERCIAL_MIN_GLPI_VERSION", "10.0.0");
 
 // Maximum GLPI version, exclusive
 /** @phpstan-ignore theCodingMachineSafe.function (safe to assume this isn't already defined) */
-define("PLUGIN_RELATORIOGLPICOMERCIAL_MAX_GLPI_VERSION", "11.0.99");
+define("PLUGIN_RELATORIOGLPICOMERCIAL_MAX_GLPI_VERSION", "10.0.99");
+
+// GLPI 10.x has no global htmlescape() helper (added in 11.0); this plugin's
+// front scripts rely on it to escape output, so provide the same
+// implementation core uses from 11.0 onward when it is missing.
+if (!function_exists('htmlescape')) {
+    function htmlescape(mixed $str): string
+    {
+        return htmlspecialchars((string) $str);
+    }
+}
 
 /**
  * Init hooks of the plugin.

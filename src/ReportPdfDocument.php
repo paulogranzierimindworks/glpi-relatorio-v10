@@ -49,11 +49,12 @@ class ReportPdfDocument extends GLPIPDF
             'margin_bottom' => 18,
             'margin_header' => 0,
             'margin_footer' => 10,
-        ], null, null, false);
+        ]);
 
+        // GLPIPDF::__construct() already calls AddPage() internally in GLPI
+        // 10.x (it has no $addpage flag to opt out), so no extra call here.
         $this->SetTitle($heading);
         $this->SetSubject($eyebrow);
-        $this->AddPage();
     }
 
     /**

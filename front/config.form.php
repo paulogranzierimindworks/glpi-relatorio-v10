@@ -9,6 +9,8 @@
  * -------------------------------------------------------------------------
  */
 
+include('../../../inc/includes.php');
+
 use GlpiPlugin\Relatorioglpicomercial\EntityMailConfig;
 use GlpiPlugin\Relatorioglpicomercial\MailConfig;
 use GlpiPlugin\Relatorioglpicomercial\Menu;

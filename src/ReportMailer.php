@@ -15,9 +15,6 @@ use Config;
 use CronTask;
 use DateTimeImmutable;
 use GLPIMailer;
-use Symfony\Component\Mailer\Transport;
-use Symfony\Component\Mailer\Transport\TransportInterface;
-use Symfony\Component\Mime\Address;
 use Throwable;
 
 /**
@@ -95,8 +92,7 @@ class ReportMailer
             $rows[$row['entities_id']] = $row;
         }
 
-        $transport = self::buildTransport();
-        $sent      = 0;
+        $sent = 0;
 
         foreach ($pending as $entities_id => $entity_config) {
             if (!isset($rows[$entities_id])) {
@@ -122,8 +118,7 @@ class ReportMailer
                 $config,
                 $date_start,
                 $date_end,
-                $recipients['emails'],
-                $transport
+                $recipients['emails']
             );
 
             if ($error !== null) {
@@ -160,7 +155,7 @@ class ReportMailer
 
         foreach (Report::getGeneralReport($date_start, $date_end) as $row) {
             if ($row['entities_id'] === $entities_id) {
-                return self::send($row, $config, $date_start, $date_end, [$email], self::buildTransport());
+                return self::send($row, $config, $date_start, $date_end, [$email]);
             }
         }
 
@@ -178,8 +173,7 @@ class ReportMailer
         array $config,
         string $date_start,
         string $date_end,
-        array $emails,
-        ?TransportInterface $transport
+        array $emails
     ): ?string {
         $entities_id = (int) $row['entities_id'];
         $sender      = Config::getEmailSender($entities_id);
@@ -191,19 +185,22 @@ class ReportMailer
         $variables = self::buildVariables($row, $date_start, $date_end);
 
         try {
-            $mailer = new GLPIMailer($transport);
-            $email  = $mailer->getEmail();
-            $email->getHeaders()->addTextHeader('Auto-Submitted', 'auto-generated');
-            $email->getHeaders()->addTextHeader('X-Auto-Response-Suppress', 'OOF, DR, NDR, RN, NRN');
-            $email->from(new Address($sender['email'], $sender['name'] ?? ''));
+            // GLPIMailer extends PHPMailer in GLPI 10.x and self-configures its
+            // SMTP transport from $CFG_GLPI on construction: one instance per
+            // message, as core's own NotificationMailing does.
+            $mailer = new GLPIMailer();
+            $mailer->addCustomHeader('Auto-Submitted', 'auto-generated');
+            $mailer->addCustomHeader('X-Auto-Response-Suppress', 'OOF, DR, NDR, RN, NRN');
+            $mailer->setFrom($sender['email'], $sender['name'] ?? '');
             foreach ($emails as $recipient) {
-                $email->addTo(new Address($recipient));
+                $mailer->addAddress($recipient);
             }
-            $email->subject(self::renderTemplate(MailConfig::getEffectiveSubject($config), $variables, false));
-            $email->html(self::renderTemplate(MailConfig::getEffectiveBody($config), $variables, true));
+            $mailer->Subject = self::renderTemplate(MailConfig::getEffectiveSubject($config), $variables, false);
+            $mailer->isHTML(true);
+            $mailer->Body = self::renderTemplate(MailConfig::getEffectiveBody($config), $variables, true);
 
             if (!$mailer->send()) {
-                return $mailer->getError() ?? __('Falha desconhecida no envio.', 'relatorioglpicomercial');
+                return $mailer->ErrorInfo !== '' ? $mailer->ErrorInfo : __('Falha desconhecida no envio.', 'relatorioglpicomercial');
             }
         } catch (Throwable $e) {
             return $e->getMessage();
@@ -258,19 +255,5 @@ class ReportMailer
             },
             $template
         );
-    }
-
-    /**
-     * One transport reused for the whole batch, as core does in
-     * NotificationEventMailing::send(). Falls back to a per-message transport
-     * when the DSN cannot be built.
-     */
-    private static function buildTransport(): ?TransportInterface
-    {
-        try {
-            return Transport::fromDsn(GLPIMailer::buildDsn(true));
-        } catch (Throwable) {
-            return null;
-        }
     }
 }
