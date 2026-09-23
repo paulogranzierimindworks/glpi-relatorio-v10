@@ -12,6 +12,7 @@
 namespace GlpiPlugin\Relatorioglpicomercial;
 
 use Config;
+use Glpi\Toolbox\Sanitizer;
 use Plugin;
 
 /**
@@ -65,6 +66,15 @@ class MailConfig
             $config[$name] = (int) $config[$name];
         }
 
+        // Values saved before validate() decoded them are still HTML-encoded
+        // (no literal "<" but "&#60;"): repair them on the fly.
+        foreach (['subject', 'body_html'] as $name) {
+            $value = (string) $config[$name];
+            if (!str_contains($value, '<') && preg_match('/&#(?:60|62|38|34|39);/', $value) === 1) {
+                $config[$name] = Sanitizer::unsanitize($value);
+            }
+        }
+
         return $config;
     }
 
@@ -99,8 +109,10 @@ class MailConfig
             'send_day'     => self::clamp($input['send_day'] ?? null, 1, 31, $defaults['send_day']),
             'window_type'  => $window_type,
             'window_days'  => self::clamp($input['window_days'] ?? null, 1, 365, $defaults['window_days']),
-            'subject'      => trim((string) ($input['subject'] ?? '')),
-            'body_html'    => trim((string) ($input['body_html'] ?? '')),
+            // GLPI 10 HTML-encodes every $_POST value on the way in (< becomes
+            // &#60;); stored as is, the body would reach the mail as literal text.
+            'subject'      => trim(Sanitizer::unsanitize((string) ($input['subject'] ?? ''))),
+            'body_html'    => trim(Sanitizer::unsanitize((string) ($input['body_html'] ?? ''))),
         ];
     }
 
@@ -109,6 +121,15 @@ class MailConfig
      */
     public static function save(array $values): void
     {
+        // GLPI 10 does not quote values on its own: core expects them already
+        // SQL-escaped (as Sanitizer::sanitize() leaves them), so a quote in the
+        // HTML body would otherwise break — or inject into — the query.
+        foreach ($values as $name => $value) {
+            if (is_string($value)) {
+                $values[$name] = Sanitizer::dbEscape($value);
+            }
+        }
+
         Config::setConfigurationValues(self::CONTEXT, $values);
     }
 
