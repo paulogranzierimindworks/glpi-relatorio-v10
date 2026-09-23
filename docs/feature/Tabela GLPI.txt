@@ -1,0 +1,120 @@
+1 - ID = 'glpidb DIM_CHAMADOS'[id_chamado]
+
+2 - TIPO = 'glpi_tickets'[Status_TipoDoChamado]
+
+	Status_TipoDoChamado = 
+SWITCH(
+    TRUE(),
+    'glpi_tickets'[type] = 1, "Incidente",
+    'glpi_tickets'[type] = 2, "Requisição",
+    "Outro"
+)
+
+3 - SOLICITANTE = 'glpidb DIM_REQUERENTES'[Name]
+
+4 - CATEGORIA = 'glpidb DIM_CATEGORIAS_CHAMADOS'[completename]
+
+5 - ANALISTA = 'glpidb DIM_USUARIOS'[Usuario]
+
+6 - TÍTULO CHAMADO = 'glpi_tickets'[name]
+
+7 - PRIORIDADE = 'FAT_CHAMADOS'[Status_Urgencia]
+
+	Status_Urgencia = 
+SWITCH(
+    TRUE(),
+    'FAT_CHAMADOS'[urgency] = 1, "Muito Baixa",
+    'FAT_CHAMADOS'[urgency] = 2, "Baixa",
+    'FAT_CHAMADOS'[urgency] = 3, "Média",
+    'FAT_CHAMADOS'[urgency] = 4, "Alta",
+    'FAT_CHAMADOS'[urgency] = 5, "Muito Alta",
+    "Outro"
+)
+
+8 - STATUS = 'glpidb DIM_CHAMADOS'[Status_Descricao]
+
+	Status_Descricao = 
+SWITCH(
+    TRUE(),
+    'glpidb DIM_CHAMADOS'[status] = 1, "Novo",
+    'glpidb DIM_CHAMADOS'[status] = 2 || 'glpidb DIM_CHAMADOS'[status] = 3, "Em atendimento",
+    'glpidb DIM_CHAMADOS'[status] = 4, "Pendente",
+    'glpidb DIM_CHAMADOS'[status] = 5, "Solucionado",
+    'glpidb DIM_CHAMADOS'[status] = 6, "Fechado",
+    "Outro"
+)
+
+9 - ABERTURA = 'glpi_tickets'[date_creation]
+
+10 - PRIMEIRO ATENDIMENTO = 'glpi_tickets'[takeintoaccountdate]
+
+11 - SOLUÇÃO = 'glpi_tickets'[solvedate]
+
+12 - TEMPO PARA SOLUÇÃO = 'glpi_tickets'[time_to_resolve]
+
+13 - HORAS PREVISTAS = 'glpi_plugin_fields_ticketprevisodehoras'[horasprevistasfieldtwo]
+
+14 - TOTAL HORAS APONTADAS = 'glpi_tickets'[Total_Tempo_Trabalhado_Task_Coluna]
+
+	Total_Tempo_Trabalhado_Task_Coluna = 
+VAR TotalSegundos = glpi_tickets[actiontime]  // Usa o valor da linha atual
+VAR HorasTotais = QUOTIENT(TotalSegundos, 3600)  
+VAR MinutosTotais = QUOTIENT(MOD(TotalSegundos, 3600), 60)  
+VAR SegundosTotais = MOD(TotalSegundos, 60)  
+VAR AjusteHoras = HorasTotais + QUOTIENT(MinutosTotais, 60)  
+VAR AjusteMinutos = MOD(MinutosTotais, 60)  
+
+RETURN 
+    IF(TotalSegundos = 0, 
+        "",  
+        FORMAT(AjusteHoras, "00") & ":" & FORMAT(AjusteMinutos, "00") & ":" & FORMAT(SegundosTotais, "00")  
+    )
+
+15 - HORAS APONTADAS = glpi_tickettasks'[_HorasTrabalhadas_Tasks]
+
+	_HorasTrabalhadas_Tasks = 
+
+VAR TotalSegundos = [_action_time_second_tasks]
+
+VAR Horas = INT(TotalSegundos / 3600)
+
+VAR Minutos = 
+INT(
+    MOD(TotalSegundos,3600) / 60
+)
+
+VAR Segundos = 
+MOD(TotalSegundos,60)
+
+RETURN
+
+IF(
+    TotalSegundos = 0,
+    BLANK(),
+    FORMAT(Horas,"00") & ":" &
+    FORMAT(Minutos,"00") & ":" &
+    FORMAT(Segundos,"00")
+)
+
+16 - SLA Atendimento = 
+SWITCH(
+    TRUE(),
+    NOT('glpi_tickets'[status] IN {5, 6}), "Em andamento",
+    ISBLANK('glpi_tickets'[time_to_own]), "Sem prazo definido",
+    ISBLANK('glpi_tickets'[takeintoaccountdate]), "A validar",
+    'glpi_tickets'[takeintoaccountdate] > 'glpi_tickets'[time_to_own], "Violado",
+    "No prazo"
+)
+
+17 - SLA Solução = 
+SWITCH(
+    TRUE(),
+    NOT('glpi_tickets'[status] IN {5, 6}), "Em andamento",
+    ISBLANK('glpi_tickets'[time_to_resolve]), "Sem prazo definido",
+    ISBLANK('glpi_tickets'[solvedate]), "A validar",
+    'glpi_tickets'[solvedate] > 'glpi_tickets'[time_to_resolve], "Violado",
+    "No prazo"
+)
+
+18 - NOTA = 'glpi_ticketsatisfactions'[satisfaction]
+	

@@ -1,0 +1,264 @@
+{#
+ # On-screen "Dashboard de Chamados": SLA and type donuts, hours per category,
+ # status KPIs and the detailed ticket table, using GLPI's own theme variables (light/dark follows the user's theme).
+ # Rendered inline inside a regular GLPI page, so it is a fragment. Every style
+ # is scoped under .rgc-dash so nothing leaks into the rest of GLPI. The donuts
+ # are drawn by the Chartist build GLPI already ships (Html::requireJs('charts')).
+ #}
+
+<style>
+   .rgc-dash { --rgc-panel: var(--tblr-bg-surface, var(--tblr-card-bg, transparent)); --rgc-border: var(--tblr-border-color, rgba(128, 128, 128, .3));
+      --rgc-head: var(--tblr-bg-surface-tertiary, rgba(128, 128, 128, .15)); --rgc-stripe: var(--tblr-table-striped-bg, rgba(128, 128, 128, .08));
+      --rgc-muted: var(--tblr-secondary, rgba(128, 128, 128, .9)); color: var(--tblr-body-color, inherit); }
+   .rgc-dash * { box-sizing: border-box; }
+   .rgc-dash-title { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: .5rem; margin-bottom: .75rem; }
+   .rgc-dash-title h2 { margin: 0; font-size: 1.15rem; }
+   .rgc-dash-title small { color: var(--rgc-muted); }
+   .rgc-top { display: grid; grid-template-columns: 1fr 1.25fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+   @media (max-width: 991px) { .rgc-top { grid-template-columns: 1fr; } }
+   .rgc-panel { background: var(--rgc-panel); border: 1px solid var(--rgc-border); border-radius: var(--tblr-border-radius, .25rem); padding: .75rem; }
+   .rgc-panel h3 { margin: 0 0 .5rem; text-align: center; font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--rgc-muted); }
+   .rgc-donut { height: 250px; }
+   .rgc-donut svg { display: block; margin: 0 auto; }
+   .rgc-donut .ct-slice-donut { fill: none; }
+   .rgc-legend { list-style: none; margin: .5rem 0 0; padding: 0; font-size: .85rem; }
+   .rgc-legend li { display: flex; align-items: center; gap: .5rem; padding: .1rem 0; }
+   .rgc-legend .rgc-dot { width: .75rem; height: .75rem; border-radius: 50%; flex: none; }
+   .rgc-legend .rgc-legend-value { margin-left: auto; color: var(--rgc-muted); }
+   .rgc-empty { text-align: center; color: var(--rgc-muted); padding: 2rem 0; }
+   .rgc-center { display: flex; flex-direction: column; gap: 1rem; }
+   .rgc-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; }
+   .rgc-kpi { background: var(--rgc-panel); border: 1px solid var(--rgc-border); border-radius: var(--tblr-border-radius, .25rem); text-align: center; padding: .9rem .25rem; }
+   .rgc-kpi-value { font-size: 1.25rem; font-weight: 700; color: var(--tblr-primary, inherit); }
+   .rgc-kpi-label { font-size: .7rem; font-weight: 700; color: var(--rgc-muted); }
+   .rgc-kpi-wide { grid-column: 1 / -1; }
+   .rgc-table { width: 100%; border-collapse: collapse; font-size: .8rem; color: inherit; }
+   .rgc-table th { background: var(--rgc-head); font-weight: 600; text-align: center; padding: .35rem .5rem; white-space: nowrap; border-bottom: 1px solid var(--rgc-border); }
+   .rgc-table td { padding: .35rem .5rem; border-bottom: 1px solid var(--rgc-border); }
+   .rgc-table tbody tr:nth-child(even) td { background: var(--rgc-stripe); }
+   .rgc-table tbody tr:hover td { background: var(--tblr-table-hover-bg, var(--rgc-head)); }
+   .rgc-table tfoot td { background: var(--rgc-head); font-weight: 700; }
+   .rgc-cats td, .rgc-cats th { text-align: left; }
+   .rgc-cats td:last-child, .rgc-cats th:last-child { text-align: center; white-space: nowrap; }
+   .rgc-tickets-wrap { overflow-x: auto; }
+   .rgc-tickets td { text-align: center; vertical-align: middle; }
+   .rgc-tickets td.rgc-left { text-align: left; }
+   .rgc-tickets td.rgc-nowrap { white-space: nowrap; }
+   .rgc-sla-violado { color: var(--tblr-red, #d63939); font-weight: 600; }
+   .rgc-sla-ok { color: var(--tblr-green, #2fb344); font-weight: 600; }
+</style>
+
+<div class="rgc-dash">
+   <div class="rgc-dash-title">
+      <h2>{{ __('Dashboard de Chamados', 'relatorioglpicomercial') }}</h2>
+      <small>{{ date_start_fmt }} – {{ date_end_fmt }}</small>
+   </div>
+
+   <div class="rgc-top">
+      <div class="rgc-panel">
+         <h3>{{ __('SLA', 'relatorioglpicomercial') }}</h3>
+         {% if sla_series is not empty %}
+            <div class="rgc-donut" data-series="{{ sla_series|json_encode|e('html_attr') }}"></div>
+            <ul class="rgc-legend">
+               {% for item in sla_series %}
+                  <li>
+                     <span class="rgc-dot" style="background: {{ item.color }}"></span>
+                     <span>{{ item.label }}</span>
+                     <span class="rgc-legend-value">{{ item.pct }} ({{ item.value }})</span>
+                  </li>
+               {% endfor %}
+            </ul>
+         {% else %}
+            <div class="rgc-empty">{{ __('Sem dados', 'relatorioglpicomercial') }}</div>
+         {% endif %}
+      </div>
+
+      <div class="rgc-center">
+         <div class="rgc-panel">
+            <h3>{{ __('Horas Categorias', 'relatorioglpicomercial') }}</h3>
+            <table class="rgc-table rgc-cats">
+               <thead>
+                  <tr>
+                     <th>{{ __('Categoria', 'relatorioglpicomercial') }}</th>
+                     <th>{{ __('Total Horas', 'relatorioglpicomercial') }}</th>
+                  </tr>
+               </thead>
+               <tbody>
+                  {% for categoria in categorias %}
+                     <tr>
+                        <td>{{ categoria.categoria }}</td>
+                        <td>{{ categoria.tempo_fmt }}</td>
+                     </tr>
+                  {% else %}
+                     <tr>
+                        <td colspan="2" class="rgc-empty">{{ __('Nenhuma hora apontada no período.', 'relatorioglpicomercial') }}</td>
+                     </tr>
+                  {% endfor %}
+               </tbody>
+               <tfoot>
+                  <tr>
+                     <td>{{ __('Total', 'relatorioglpicomercial') }}</td>
+                     <td style="text-align: center">{{ total_periodo_fmt }}</td>
+                  </tr>
+               </tfoot>
+            </table>
+         </div>
+
+         <div class="rgc-kpis">
+            <div class="rgc-kpi">
+               <div class="rgc-kpi-value">{{ kpis.em_atendimento }}</div>
+               <div class="rgc-kpi-label">{{ __('Em Atendimento', 'relatorioglpicomercial') }}</div>
+            </div>
+            <div class="rgc-kpi">
+               <div class="rgc-kpi-value">{{ kpis.pendente }}</div>
+               <div class="rgc-kpi-label">{{ __('Pendente', 'relatorioglpicomercial') }}</div>
+            </div>
+            <div class="rgc-kpi">
+               <div class="rgc-kpi-value">{{ kpis.fechado }}</div>
+               <div class="rgc-kpi-label">{{ __('Fechado', 'relatorioglpicomercial') }}</div>
+            </div>
+            <div class="rgc-kpi">
+               <div class="rgc-kpi-value">{{ kpis.total }}</div>
+               <div class="rgc-kpi-label">{{ __('Total', 'relatorioglpicomercial') }}</div>
+            </div>
+            <div class="rgc-kpi">
+               <div class="rgc-kpi-value">{{ kpis.violado }}</div>
+               <div class="rgc-kpi-label">{{ __('Violado', 'relatorioglpicomercial') }}</div>
+            </div>
+            <div class="rgc-kpi">
+               <div class="rgc-kpi-value">{{ kpis.no_prazo }}</div>
+               <div class="rgc-kpi-label">{{ __('No Prazo', 'relatorioglpicomercial') }}</div>
+            </div>
+            <div class="rgc-kpi rgc-kpi-wide">
+               <div class="rgc-kpi-value">{{ media_satisfacao }}</div>
+               <div class="rgc-kpi-label">{{ __('Média de Satisfação', 'relatorioglpicomercial') }}</div>
+            </div>
+         </div>
+      </div>
+
+      <div class="rgc-panel">
+         <h3>{{ __('Tipo do Chamado', 'relatorioglpicomercial') }}</h3>
+         {% if tipo_series is not empty %}
+            <div class="rgc-donut" data-series="{{ tipo_series|json_encode|e('html_attr') }}"></div>
+            <ul class="rgc-legend">
+               {% for item in tipo_series %}
+                  <li>
+                     <span class="rgc-dot" style="background: {{ item.color }}"></span>
+                     <span>{{ item.label }}</span>
+                     <span class="rgc-legend-value">{{ item.pct }} ({{ item.value }})</span>
+                  </li>
+               {% endfor %}
+            </ul>
+         {% else %}
+            <div class="rgc-empty">{{ __('Sem dados', 'relatorioglpicomercial') }}</div>
+         {% endif %}
+      </div>
+   </div>
+
+   <div class="rgc-panel">
+      <h3>{{ __('Chamados', 'relatorioglpicomercial') }}</h3>
+      <div class="rgc-tickets-wrap">
+         <table class="rgc-table rgc-tickets">
+            <thead>
+               <tr>
+                  <th>{{ __('ID', 'relatorioglpicomercial') }}</th>
+                  <th>{{ __('Tipo', 'relatorioglpicomercial') }}</th>
+                  <th>{{ __('Solicitante', 'relatorioglpicomercial') }}</th>
+                  <th>{{ __('Categoria', 'relatorioglpicomercial') }}</th>
+                  <th>{{ __('Analista', 'relatorioglpicomercial') }}</th>
+                  <th>{{ __('Título Chamado', 'relatorioglpicomercial') }}</th>
+                  <th>{{ __('Prioridade', 'relatorioglpicomercial') }}</th>
+                  <th>{{ __('Status', 'relatorioglpicomercial') }}</th>
+                  <th>{{ __('Abertura', 'relatorioglpicomercial') }}</th>
+                  <th>{{ __('Tempo para Atendimento', 'relatorioglpicomercial') }}</th>
+                  <th>{{ __('Solução', 'relatorioglpicomercial') }}</th>
+                  <th>{{ __('Tempo para Solução', 'relatorioglpicomercial') }}</th>
+                  <th>{{ __('Horas Previstas', 'relatorioglpicomercial') }}</th>
+                  <th>{{ __('Total Horas Apontadas', 'relatorioglpicomercial') }}</th>
+                  <th>{{ __('Horas Apontadas Período', 'relatorioglpicomercial') }}</th>
+                  <th>{{ __('SLA', 'relatorioglpicomercial') }}</th>
+                  <th>{{ __('Nota', 'relatorioglpicomercial') }}</th>
+               </tr>
+            </thead>
+            <tbody>
+               {% for row in rows %}
+                  <tr>
+                     <td class="rgc-nowrap">
+                        {% if can_link_item %}
+                           <a href="{{ 'Ticket'|itemtype_form_path(row.id) }}" target="_blank" rel="noopener">{{ row.id }}</a>
+                        {% else %}
+                           {{ row.id }}
+                        {% endif %}
+                     </td>
+                     <td>{{ row.tipo }}</td>
+                     <td>{{ row.solicitante }}</td>
+                     <td>{{ row.categoria }}</td>
+                     <td>{{ row.analista }}</td>
+                     <td class="rgc-left">{{ row.titulo }}</td>
+                     <td>{{ row.prioridade }}</td>
+                     <td>{{ row.status }}</td>
+                     <td class="rgc-nowrap">{{ row.abertura_fmt }}</td>
+                     <td class="rgc-nowrap">{{ row.tempo_atendimento_fmt }}</td>
+                     <td class="rgc-nowrap">{{ row.solucao_fmt }}</td>
+                     <td class="rgc-nowrap">{{ row.tempo_solucao_fmt }}</td>
+                     <td class="rgc-nowrap">{{ row.horas_previstas }}</td>
+                     <td class="rgc-nowrap">{{ row.total_fmt }}</td>
+                     <td class="rgc-nowrap">{{ row.periodo_fmt }}</td>
+                     <td class="rgc-nowrap {{ row.sla == 'Violado' ? 'rgc-sla-violado' : (row.sla == 'No Prazo' ? 'rgc-sla-ok' : '') }}">{{ row.sla }}</td>
+                     <td>{{ row.nota_fmt }}</td>
+                  </tr>
+               {% else %}
+                  <tr>
+                     <td colspan="17" class="rgc-empty">{{ __('Nenhum chamado encontrado para os filtros informados.', 'relatorioglpicomercial') }}</td>
+                  </tr>
+               {% endfor %}
+            </tbody>
+            <tfoot>
+               <tr>
+                  <td colspan="14" style="text-align: left">{{ __('Total', 'relatorioglpicomercial') }}</td>
+                  <td style="text-align: center">{{ total_periodo_fmt }}</td>
+                  <td colspan="2"></td>
+               </tr>
+            </tfoot>
+         </table>
+      </div>
+   </div>
+</div>
+
+<script>
+   window.addEventListener('load', function () {
+      if (typeof Chartist === 'undefined') {
+         return;
+      }
+      document.querySelectorAll('.rgc-dash .rgc-donut').forEach(function (el) {
+         var series = [];
+         try {
+            series = JSON.parse(el.getAttribute('data-series') || '[]');
+         } catch (e) {
+            return;
+         }
+         if (!series.length) {
+            return;
+         }
+
+         var width = 46;
+         var chart = new Chartist.Pie(el, {
+            labels: series.map(function (s) { return s.label; }),
+            series: series.map(function (s) { return s.value; })
+         }, {
+            donut: true,
+            donutWidth: width,
+            showLabel: false,
+            chartPadding: 8
+         });
+
+         chart.on('draw', function (context) {
+            if (context.type === 'slice') {
+               context.element.attr({
+                  style: 'stroke: ' + series[context.index].color + '; stroke-width: ' + width + 'px'
+               });
+            }
+         });
+      });
+   });
+</script>

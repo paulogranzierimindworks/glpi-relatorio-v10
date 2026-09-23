@@ -175,7 +175,7 @@ class ReportRenderer
         return $percentual >= self::USAGE_WARN ? self::COLOR_WARN : self::COLOR_OK;
     }
 
-    private static function formatSeconds(int $seconds): string
+    public static function formatSeconds(int $seconds): string
     {
         $seconds = max(0, $seconds);
         return sprintf('%02d:%02d:%02d', intdiv($seconds, 3600), intdiv($seconds % 3600, 60), $seconds % 60);

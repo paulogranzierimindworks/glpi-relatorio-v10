@@ -1,0 +1,68 @@
+# ############################################################################# 
+# Equipe de Suporte N3 Mindworks                                              #
+# Objetivo: Query para consulta ao banco de dados GLPI V.10.0.10              #
+# Autor: Douglas Ferreira Tesch                                               #
+# Data: 06/07/2023                                                            #
+# Atualizado em: 02/07/2024                                                   #
+# Atualizado por: Douglas Ferreira Tesch                                      #
+# #############################################################################
+Select t.id as Num_Chamado,
+e.name as Cliente,
+(case
+	when t.type = 1 then "Incidente"
+    when t.type = 2 then "Requisição"
+End) as TipoChamado,
+rt.name as MetodoAbertura,
+(select concat(u.firstname, ' ', u.realname) from  glpi_tickets_users tu Inner Join glpi_users u on tu.users_id = u.id where tu.type = 1 and tu.tickets_id = t.id limit 1) as Requerente, 
+t.name as Titulo,
+t.content as Descricao,
+ct.completename as Categoria,
+(case
+	when t.urgency = 1 then "Muito Baixa"
+    when t.urgency = 2 then "Baixa"
+    when t.urgency = 3 then "Média"
+    when t.urgency = 4 then "Alta"
+    when t.urgency = 5 then "Muito Alta"
+End) as Urgencia,
+(case
+	when t.status = 1 then "Novo"
+    when t.status = 2 or t.status = 3 then "Em atendimento"
+    when t.status = 4 then "Pendente"
+    when t.status = 5 then "Solucionado"
+    when t.status = 6 then "Fechado"
+End) as Status,
+l.name as Local,
+t.date_mod as UltimaInteracao,
+t.date as DataHoraAbertura,
+t.solvedate as DataHoraSolucao,
+t.closedate as DataHoraFechamento,
+t.time_to_own as DataHoraSLAAtendimento,
+t.time_to_resolve as DataHoraSLASolucao,
+slaSol.name as SLA_Solucao,
+slaAte.name as SLA_Atendimento,
+if(isnull(t.takeintoaccountdate),"Aguardando primeiro atendimento",if(t.takeintoaccountdate>t.time_to_own,"Violado","No prazo")) as StatusSLAAtendimento,
+if(isnull(t.solvedate),"Chamado não solucionado",if(t.solvedate>t.time_to_resolve,"Violado","No prazo")) as StatusSLASolucao,
+(select concat(u.firstname, ' ', u.realname) from  glpi_tickets_users tu Inner Join glpi_users u on tu.users_id = u.id where tu.type = 1 and tu.tickets_id = t.id limit 1) as Requerente,
+(select concat(u.firstname, ' ', u.realname) from  glpi_tickets_users tu Inner Join glpi_users u on tu.users_id = u.id where tu.type = 2 and tu.tickets_id = t.id limit 1) as Tecnico,
+(select g.name from glpi_groups_tickets gt inner join glpi_groups g	on gt.groups_id = g.id	where gt.type = 2 and gt.tickets_id = t.id) as Grupo_Solução,
+(select sum(tar.actiontime) as Tempo_Trabalhado from glpi_tickettasks tar where tar.tickets_id = t.id) as Tempo_Trabalhado_minutos,
+(select tas.content from glpi_tickettasks tas where tas.tickets_id = t.id and tas.id = (select max(tas1.id) from glpi_tickettasks tas1 where tas1.tickets_id = t.id)) as Comentario_UltimaTarefa,
+(select content from glpi_itilfollowups where items_id = t.id and id = (select max(id) from glpi_itilfollowups where items_id = t.id)) as Comentario_UltimoFollowUp,
+(select content from glpi_itilsolutions where items_id = t.id and id = (select max(id) from glpi_itilsolutions where items_id = t.id)) as Comentario_Solucao,
+(select st.name from glpi_itilsolutions ss left join glpi_solutiontypes st on ss.solutiontypes_id = st.id where ss.items_id = t.id and ss.id = (select max(ss.Id) from glpi_itilsolutions ss left join glpi_solutiontypes st on ss.solutiontypes_id = st.id where ss.items_id = t.id)) as UltimoTipoSolucao,
+(select count(id) from glpi_itilsolutions where items_id = t.id) as Total_Solucoes
+From glpi_tickets t
+inner join glpi_entities e 
+on t.entities_id = e.id
+left join glpi_requesttypes rt
+on t.requesttypes_id = rt.id
+left join glpi_locations l
+on t.locations_id = l.id
+left join glpi_slas slaSol
+on t.slas_id_ttr = slaSol.id
+left join glpi_slas slaAte
+on t.slas_id_tto = slaAte.id
+left join glpi_itilcategories ct
+on t.itilcategories_id = ct.id
+where 
+t.is_deleted = false

@@ -66,8 +66,10 @@ function plugin_init_relatorioglpicomercial(): void
         return;
     }
 
-    $PLUGIN_HOOKS['menu_toadd']['relatorioglpicomercial']['tools']
-        = \GlpiPlugin\Relatorioglpicomercial\Menu::class;
+    $PLUGIN_HOOKS['menu_toadd']['relatorioglpicomercial']['tools'] = [
+        \GlpiPlugin\Relatorioglpicomercial\Menu::class,
+        \GlpiPlugin\Relatorioglpicomercial\DashboardMenu::class,
+    ];
 
     // Wrench icon next to the plugin in Setup > Plugins.
     $PLUGIN_HOOKS['config_page']['relatorioglpicomercial'] = 'front/config.form.php';

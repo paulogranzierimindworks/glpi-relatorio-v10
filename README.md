@@ -71,6 +71,40 @@ abertos no período) e o percentual de utilização. O percentual é colorido:
 Entidades sem contrato com horas e entidades cujo nome completo contém
 `INATIVOS` não entram no relatório.
 
+### Dashboard de Chamados
+
+O menu **Ferramentas > Dashboard de Chamados** (`front/dashboard.php`) abre um
+painel que segue o tema do GLPI, com filtros de entidade, período, categoria,
+status e analista (todos opcionais, exceto o período). Ele mostra:
+
+- rosca de **SLA** e rosca de **Tipo do chamado**;
+- **Horas Categorias**: horas apontadas no período por categoria;
+- KPIs de status (Em Atendimento, Pendente, Fechado, Total), SLA (Violado, No
+  Prazo) e **Média de Satisfação**;
+- tabela **Chamados**, com uma linha por chamado e analista.
+
+Entram no painel os chamados com tarefas apontadas no período (data da tarefa)
+**ou** abertos no período. A data de abertura é `date_creation`, com `date` como
+alternativa nos chamados antigos em que ela é nula; o mesmo critério vale para o
+filtro e para a coluna **Abertura**. "Horas Apontadas Período" soma só as
+tarefas do analista dentro do período; "Total Horas Apontadas" é o tempo total
+do chamado.
+
+As colunas seguem `docs/feature/Tabela GLPI.txt`. Duas observações: **Tempo para
+Atendimento** mostra o prazo de atendimento (`time_to_own`), e não a data do
+primeiro atendimento do item 10; o **SLA de Atendimento** (item 16) não é
+exibido, o painel traz só o SLA de solução, como na imagem de referência.
+
+Regras de SLA (prazo de solução): chamado solucionado/fechado é **Violado** se
+`solvedate` passou de `time_to_resolve`, **A validar** se ainda não tem data de
+solução e **Sem prazo definido** se não há prazo. Chamado em andamento é
+**Violado** se o prazo já passou e **No Prazo** caso contrário. Os status
+seguem `docs/feature/Tabela GLPI.txt` (2 e 3 = Em atendimento).
+
+A coluna **Horas Previstas** vem do plugin *Fields*
+(`glpi_plugin_fields_ticketprevisodehoras.horasprevistasfieldtwo`) e fica vazia
+quando essa tabela não existe. As roscas usam o Chartist que já acompanha o GLPI.
+
 ## Envio automático por e-mail
 
 Configurado em **Configurar > Plugins > Relatorio Comercial** (ícone de chave
@@ -175,6 +209,7 @@ Estrutura principal:
 | `front/`                         | Telas: relatórios, PDF, configuração e direitos por perfil      |
 | `src/Report.php`                 | Consultas dos relatórios                                        |
 | `src/ReportRenderer.php`         | Formatação e dados de apresentação                              |
+| `src/Dashboard*.php`             | Dashboard de Chamados: consultas, apresentação e menu           |
 | `src/ReportPdf*.php`             | Exportação em PDF (TCPDF)                                       |
 | `src/ReportScheduler.php`        | Lógica pura de quando enviar e qual período cobrir              |
 | `src/ReportMailer.php`           | Ação automática e montagem do e-mail                            |
