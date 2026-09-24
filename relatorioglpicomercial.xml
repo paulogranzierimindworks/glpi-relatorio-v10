@@ -3,7 +3,7 @@
    <key>relatorioglpicomercial</key>
    <!-- stable, beta, development, alpha, ... -->
    <state>development</state>
-   <logo>https://raw.githubusercontent.com/pluginsGLPI/relatorioglpicomercial/main/relatorioglpicomercial.png</logo>
+   <logo>https://raw.githubusercontent.com/paulogranzierimindworks/glpi-relatorio-v10/main/logo.png</logo>
    <description>
       <short>
          <en>Commercial reports for GLPI</en>
@@ -14,10 +14,11 @@
          <fr>Affiche les rapports de tickets/SLA par client et les rapports d'heures contractuelles, avec export PDF.</fr>
       </long>
    </description>
-   <homepage>https://github.com/pluginsGLPI/relatorioglpicomercial</homepage>
-   <download>https://github.com/pluginsGLPI/relatorioglpicomercial/releases</download>
-   <issues>https://github.com/pluginsGLPI/relatorioglpicomercial/issues</issues>
-   <readme>https://github.com/pluginsGLPI/relatorioglpicomercial/blob/main/README.md</readme>
+   <homepage>https://github.com/paulogranzierimindworks/glpi-relatorio-v10</homepage>
+   <download>https://github.com/paulogranzierimindworks/glpi-relatorio-v10/releases</download>
+   <issues>https://github.com/paulogranzierimindworks/glpi-relatorio-v10/issues</issues>
+   <readme>https://github.com/paulogranzierimindworks/glpi-relatorio-v10/blob/main/README.md</readme>
+   <changelog>https://github.com/paulogranzierimindworks/glpi-relatorio-v10/blob/main/CHANGELOG.md</changelog>
    <authors>
       <author>Mindworks</author>
    </authors>
@@ -25,6 +26,7 @@
       <version>
          <num>1.0.0</num>
          <compatibility>~10.0.0</compatibility>
+         <download_url>https://github.com/paulogranzierimindworks/glpi-relatorio-v10/releases/download/1.0.0/glpi-relatorioglpicomercial-1.0.0.tar.bz2</download_url>
       </version>
    </versions>
    <langs>
@@ -33,4 +35,23 @@
       <lang>pt_BR</lang>
    </langs>
    <license>MIT</license>
+   <tags>
+      <en>
+         <tag>reports</tag>
+         <tag>tickets</tag>
+         <tag>sla</tag>
+         <tag>hours</tag>
+         <tag>pdf</tag>
+      </en>
+      <fr>
+         <tag>rapports</tag>
+         <tag>tickets</tag>
+         <tag>sla</tag>
+         <tag>heures</tag>
+         <tag>pdf</tag>
+      </fr>
+   </tags>
+   <screenshots>
+      <screenshot>https://raw.githubusercontent.com/paulogranzierimindworks/glpi-relatorio-v10/main/docs/feature/imagem%20(1).png</screenshot>
+   </screenshots>
 </root>
