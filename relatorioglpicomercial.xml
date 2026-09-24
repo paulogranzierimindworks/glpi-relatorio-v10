@@ -24,9 +24,9 @@
    </authors>
    <versions>
       <version>
-         <num>1.0.0</num>
+         <num>1.0.2</num>
          <compatibility>~10.0.0</compatibility>
-         <download_url>https://github.com/paulogranzierimindworks/glpi-relatorio-v10/releases/download/1.0.0/glpi-relatorioglpicomercial-1.0.0.tar.bz2</download_url>
+         <download_url>https://github.com/paulogranzierimindworks/glpi-relatorio-v10/archive/refs/tags/v1.0.2.tar.gz</download_url>
       </version>
    </versions>
    <langs>
