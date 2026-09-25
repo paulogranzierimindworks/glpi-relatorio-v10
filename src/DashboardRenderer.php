@@ -39,10 +39,19 @@ class DashboardRenderer
      */
     public static function render(array $rows, string $date_start, string $date_end): string
     {
+        $visible = DashboardColumns::getVisibleKeys((int) \Session::getLoginUserID());
+        $columns = DashboardColumns::describe($visible);
+
         return TemplateRenderer::getInstance()->render(
             '@relatorioglpicomercial/report_dashboard.html.twig',
             self::prepareData($rows, $date_start, $date_end)
-            + ['can_link_item' => \Session::haveRight('ticket', READ)]
+            + [
+                'can_link_item'   => \Session::haveRight('ticket', READ),
+                'columns'         => $columns,
+                'column_groups'   => DashboardColumns::getGroups(),
+                'default_columns' => DashboardColumns::getDefaultKeys(),
+                'columns_url'     => \Plugin::getWebDir('relatorioglpicomercial') . '/ajax/dashboard_columns.php',
+            ]
         );
     }
 
@@ -62,6 +71,11 @@ class DashboardRenderer
             $row['total_fmt']             = self::formatSecondsOrBlank((int) $row['total_segundos']);
             $row['periodo_fmt']           = self::formatSecondsOrBlank((int) $row['periodo_segundos']);
             $row['nota_fmt']              = $row['nota'] !== null ? (string) $row['nota'] : '';
+            $row['data_fmt']              = self::formatDateTime($row['data']);
+            $row['atualizacao_fmt']       =self::formatDateTime($row['atualizacao']);
+            $row['fechamento_fmt']        = self::formatDateTime($row['fechamento']);
+            $row['atendimento_stat_fmt']  = self::formatSecondsOrBlank((int) $row['atendimento_stat_segundos']);
+            $row['solucao_stat_fmt']      = self::formatSecondsOrBlank((int) $row['solucao_stat_segundos']);
             return $row;
         }, $rows);
 

@@ -11,6 +11,7 @@
 
 namespace GlpiPlugin\Relatorioglpicomercial\Tests;
 
+use GlpiPlugin\Relatorioglpicomercial\DashboardColumns;
 use GlpiPlugin\Relatorioglpicomercial\DashboardRenderer;
 use GlpiPlugin\Relatorioglpicomercial\DashboardReport;
 use PHPUnit\Framework\TestCase;
@@ -146,6 +147,50 @@ class DashboardReportTest extends TestCase
         $this->assertNull($summary['media_satisfacao']);
         $this->assertSame([], $summary['sla']);
         $this->assertSame([], $summary['categorias']);
+    }
+
+    public function testColumnSanitizeKeepsKnownKeysInCatalogOrder(): void
+    {
+        $this->assertSame(
+            ['id', 'status', 'nota'],
+            DashboardColumns::sanitize(['nota', 'status', 'bogus', 'id', 'id', 42])
+        );
+    }
+
+    public function testColumnSanitizeFallsBackToDefaults(): void
+    {
+        $defaults = DashboardColumns::getDefaultKeys();
+
+        $this->assertNotSame([], $defaults);
+        $this->assertSame($defaults, DashboardColumns::sanitize([]));
+        $this->assertSame($defaults, DashboardColumns::sanitize(['bogus', 'password']));
+    }
+
+    public function testEveryColumnHasALabelAndAGroup(): void
+    {
+        $groups = DashboardColumns::getGroups();
+        foreach (DashboardColumns::getCatalog() as $key => $column) {
+            $this->assertNotSame('', $column['label'], $key);
+            $this->assertArrayHasKey($column['group'], $groups, $key);
+            $this->assertNotSame('', $column['field'], $key);
+            $this->assertNotSame('', $column['source'], $key);
+        }
+    }
+
+    public function testDescribeFlagsVisibleColumns(): void
+    {
+        $columns = DashboardColumns::describe(['id', 'sla']);
+
+        $visible = array_column(array_filter($columns, static fn (array $c): bool => $c['visible']), 'key');
+        $this->assertSame(['id', 'sla'], $visible);
+        $this->assertCount(count(DashboardColumns::getCatalog()), $columns);
+    }
+
+    public function testPriorityLabelKnowsTheCriticalLevel(): void
+    {
+        $this->assertSame('Crítica', DashboardReport::priorityLabel(6));
+        $this->assertSame('Alta', DashboardReport::priorityLabel(4));
+        $this->assertSame('Outro', DashboardReport::priorityLabel(0));
     }
 
     public function testPercentFormatting(): void

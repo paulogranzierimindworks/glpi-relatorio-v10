@@ -46,6 +46,17 @@
    .rgc-tickets td.rgc-nowrap { white-space: nowrap; }
    .rgc-sla-violado { color: var(--tblr-red, #d63939); font-weight: 600; }
    .rgc-sla-ok { color: var(--tblr-green, #2fb344); font-weight: 600; }
+   .rgc-panel-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem; margin-bottom: .5rem; }
+   .rgc-panel-head h3 { margin: 0; text-align: left; }
+   .rgc-panel-tools { display: flex; align-items: center; gap: .5rem; }
+   .rgc-col-status { font-size: .75rem; color: var(--rgc-muted); }
+   .rgc-colmenu { min-width: 280px; max-height: 60vh; overflow-y: auto; padding: .25rem 0; }
+   .rgc-colmenu .rgc-colactions { display: flex; gap: .5rem; padding: .25rem 1rem .5rem; border-bottom: 1px solid var(--rgc-border); }
+   .rgc-colmenu .rgc-colgroup { padding: .5rem 1rem .1rem; font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--rgc-muted); }
+   .rgc-colmenu label.dropdown-item { display: flex; align-items: center; gap: .5rem; cursor: pointer; }
+   .rgc-col-hidden { display: none !important; }
+   .rgc-tickets tfoot td { text-align: center; }
+   .rgc-tickets tfoot td.rgc-total-label { text-align: left; }
 </style>
 
 <div class="rgc-dash">
@@ -155,75 +166,200 @@
       </div>
    </div>
 
-   <div class="rgc-panel">
-      <h3>{{ __('Chamados', 'relatorioglpicomercial') }}</h3>
+   {% set visible_columns = columns|filter(c => c.visible) %}
+   {% set first_visible = (visible_columns|first).key %}
+   <div class="rgc-panel" id="rgc-tickets-panel"
+        data-columns-url="{{ columns_url }}"
+        data-defaults="{{ default_columns|json_encode|e('html_attr') }}"
+        data-total-label="{{ __('Total', 'relatorioglpicomercial') }}"
+        data-msg-saved="{{ __('Preferência salva', 'relatorioglpicomercial') }}"
+        data-msg-error="{{ __('Não foi possível salvar a preferência', 'relatorioglpicomercial') }}">
+      <div class="rgc-panel-head">
+         <h3>{{ __('Chamados', 'relatorioglpicomercial') }}</h3>
+         <div class="rgc-panel-tools">
+            <span class="rgc-col-status" role="status"></span>
+            <div class="dropdown">
+               <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                       data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                  <i class="ti ti-columns"></i> {{ __('Colunas', 'relatorioglpicomercial') }}
+               </button>
+               <div class="dropdown-menu dropdown-menu-end rgc-colmenu">
+                  <div class="rgc-colactions">
+                     <button type="button" class="btn btn-sm btn-outline-secondary" data-rgc-action="all">{{ __('Marcar todas', 'relatorioglpicomercial') }}</button>
+                     <button type="button" class="btn btn-sm btn-outline-secondary" data-rgc-action="defaults">{{ __('Restaurar padrão', 'relatorioglpicomercial') }}</button>
+                  </div>
+                  {% for group_key, group_label in column_groups %}
+                     <div class="rgc-colgroup">{{ group_label }}</div>
+                     {% for col in columns|filter(c => c.group == group_key) %}
+                        <label class="dropdown-item" title="{{ col.source }}">
+                           <input type="checkbox" class="form-check-input m-0 rgc-col-toggle" value="{{ col.key }}"{{ col.visible ? ' checked' : '' }}>
+                           <span>{{ col.label }}</span>
+                        </label>
+                     {% endfor %}
+                  {% endfor %}
+               </div>
+            </div>
+         </div>
+      </div>
       <div class="rgc-tickets-wrap">
          <table class="rgc-table rgc-tickets">
             <thead>
                <tr>
-                  <th>{{ __('ID', 'relatorioglpicomercial') }}</th>
-                  <th>{{ __('Tipo', 'relatorioglpicomercial') }}</th>
-                  <th>{{ __('Solicitante', 'relatorioglpicomercial') }}</th>
-                  <th>{{ __('Categoria', 'relatorioglpicomercial') }}</th>
-                  <th>{{ __('Analista', 'relatorioglpicomercial') }}</th>
-                  <th>{{ __('Título Chamado', 'relatorioglpicomercial') }}</th>
-                  <th>{{ __('Prioridade', 'relatorioglpicomercial') }}</th>
-                  <th>{{ __('Status', 'relatorioglpicomercial') }}</th>
-                  <th>{{ __('Abertura', 'relatorioglpicomercial') }}</th>
-                  <th>{{ __('Tempo para Atendimento', 'relatorioglpicomercial') }}</th>
-                  <th>{{ __('Solução', 'relatorioglpicomercial') }}</th>
-                  <th>{{ __('Tempo para Solução', 'relatorioglpicomercial') }}</th>
-                  <th>{{ __('Horas Previstas', 'relatorioglpicomercial') }}</th>
-                  <th>{{ __('Total Horas Apontadas', 'relatorioglpicomercial') }}</th>
-                  <th>{{ __('Horas Apontadas Período', 'relatorioglpicomercial') }}</th>
-                  <th>{{ __('SLA', 'relatorioglpicomercial') }}</th>
-                  <th>{{ __('Nota', 'relatorioglpicomercial') }}</th>
+                  {% for col in columns %}
+                     <th data-col="{{ col.key }}" title="{{ col.source }}"{{ col.visible ? '' : ' class="rgc-col-hidden"' }}>{{ col.label }}</th>
+                  {% endfor %}
                </tr>
             </thead>
             <tbody>
                {% for row in rows %}
                   <tr>
-                     <td class="rgc-nowrap">
-                        {% if can_link_item %}
-                           <a href="{{ 'Ticket'|itemtype_form_path(row.id) }}" target="_blank" rel="noopener">{{ row.id }}</a>
-                        {% else %}
-                           {{ row.id }}
+                     {% for col in columns %}
+                        {% set css = col.class ~ (col.visible ? '' : ' rgc-col-hidden') %}
+                        {% if col.key == 'sla' %}
+                           {% set css = css ~ (row.sla == 'Violado' ? ' rgc-sla-violado' : (row.sla == 'No Prazo' ? ' rgc-sla-ok' : '')) %}
                         {% endif %}
-                     </td>
-                     <td>{{ row.tipo }}</td>
-                     <td>{{ row.solicitante }}</td>
-                     <td>{{ row.categoria }}</td>
-                     <td>{{ row.analista }}</td>
-                     <td class="rgc-left">{{ row.titulo }}</td>
-                     <td>{{ row.prioridade }}</td>
-                     <td>{{ row.status }}</td>
-                     <td class="rgc-nowrap">{{ row.abertura_fmt }}</td>
-                     <td class="rgc-nowrap">{{ row.tempo_atendimento_fmt }}</td>
-                     <td class="rgc-nowrap">{{ row.solucao_fmt }}</td>
-                     <td class="rgc-nowrap">{{ row.tempo_solucao_fmt }}</td>
-                     <td class="rgc-nowrap">{{ row.horas_previstas }}</td>
-                     <td class="rgc-nowrap">{{ row.total_fmt }}</td>
-                     <td class="rgc-nowrap">{{ row.periodo_fmt }}</td>
-                     <td class="rgc-nowrap {{ row.sla == 'Violado' ? 'rgc-sla-violado' : (row.sla == 'No Prazo' ? 'rgc-sla-ok' : '') }}">{{ row.sla }}</td>
-                     <td>{{ row.nota_fmt }}</td>
+                        <td data-col="{{ col.key }}" class="{{ css }}">
+                           {%- if col.key == 'id' and can_link_item -%}
+                              <a href="{{ 'Ticket'|itemtype_form_path(row.id) }}" target="_blank" rel="noopener">{{ row.id }}</a>
+                           {%- else -%}
+                              {{ row[col.field] }}
+                           {%- endif -%}
+                        </td>
+                     {% endfor %}
                   </tr>
                {% else %}
-                  <tr>
-                     <td colspan="17" class="rgc-empty">{{ __('Nenhum chamado encontrado para os filtros informados.', 'relatorioglpicomercial') }}</td>
+                  <tr data-rgc-empty>
+                     <td colspan="{{ visible_columns|length }}" class="rgc-empty">{{ __('Nenhum chamado encontrado para os filtros informados.', 'relatorioglpicomercial') }}</td>
                   </tr>
                {% endfor %}
             </tbody>
             <tfoot>
                <tr>
-                  <td colspan="14" style="text-align: left">{{ __('Total', 'relatorioglpicomercial') }}</td>
-                  <td style="text-align: center">{{ total_periodo_fmt }}</td>
-                  <td colspan="2"></td>
+                  {% for col in columns %}
+                     <td data-col="{{ col.key }}" class="{{ col.visible ? '' : 'rgc-col-hidden' }}{{ col.key == first_visible and col.key != 'periodo' ? ' rgc-total-label' : '' }}">
+                        {%- if col.key == 'periodo' -%}
+                           {{ total_periodo_fmt }}
+                        {%- elseif col.key == first_visible -%}
+                           {{ __('Total', 'relatorioglpicomercial') }}
+                        {%- endif -%}
+                     </td>
+                  {% endfor %}
                </tr>
             </tfoot>
          </table>
       </div>
    </div>
 </div>
+
+<script>
+   (function () {
+      var panel = document.getElementById('rgc-tickets-panel');
+      if (!panel) {
+         return;
+      }
+
+      var table = panel.querySelector('.rgc-tickets');
+      var status = panel.querySelector('.rgc-col-status');
+      var toggles = Array.prototype.slice.call(panel.querySelectorAll('.rgc-col-toggle'));
+      var defaults = [];
+      try {
+         defaults = JSON.parse(panel.getAttribute('data-defaults') || '[]');
+      } catch (e) {}
+      var saveTimer = null;
+      var statusTimer = null;
+
+      function selectedKeys() {
+         return toggles.filter(function (t) { return t.checked; }).map(function (t) { return t.value; });
+      }
+
+      function refreshFooter() {
+         var labelCell = null;
+         table.querySelectorAll('tfoot td').forEach(function (td) {
+            td.classList.remove('rgc-total-label');
+            if (td.getAttribute('data-col') !== 'periodo') {
+               td.textContent = '';
+            }
+            if (labelCell === null && !td.classList.contains('rgc-col-hidden')) {
+               labelCell = td;
+            }
+         });
+         if (labelCell !== null && labelCell.getAttribute('data-col') !== 'periodo') {
+            labelCell.textContent = panel.getAttribute('data-total-label');
+            labelCell.classList.add('rgc-total-label');
+         }
+      }
+
+      function apply() {
+         var keys = selectedKeys();
+         toggles.forEach(function (t) {
+            table.querySelectorAll('[data-col="' + t.value + '"]').forEach(function (cell) {
+               cell.classList.toggle('rgc-col-hidden', keys.indexOf(t.value) === -1);
+            });
+         });
+         var empty = table.querySelector('tr[data-rgc-empty] td');
+         if (empty) {
+            empty.setAttribute('colspan', keys.length);
+         }
+         refreshFooter();
+      }
+
+      function say(message) {
+         status.textContent = message;
+         clearTimeout(statusTimer);
+         statusTimer = setTimeout(function () { status.textContent = ''; }, 2500);
+      }
+
+      function save() {
+         clearTimeout(saveTimer);
+         saveTimer = setTimeout(function () {
+            var body = new URLSearchParams();
+            body.append('save', '1');
+            selectedKeys().forEach(function (key) { body.append('columns[]', key); });
+
+            fetch(panel.getAttribute('data-columns-url'), {
+               method: 'POST',
+               credentials: 'same-origin',
+               headers: {
+                  'X-Requested-With': 'XMLHttpRequest',
+                  'X-Glpi-Csrf-Token': typeof getAjaxCsrfToken === 'function' ? getAjaxCsrfToken() : ''
+               },
+               body: body
+            }).then(function (response) {
+               say(panel.getAttribute(response.ok ? 'data-msg-saved' : 'data-msg-error'));
+            }).catch(function () {
+               say(panel.getAttribute('data-msg-error'));
+            });
+         }, 400);
+      }
+
+      function setSelection(keys) {
+         toggles.forEach(function (t) { t.checked = keys.indexOf(t.value) !== -1; });
+         apply();
+         save();
+      }
+
+      toggles.forEach(function (t) {
+         t.addEventListener('change', function () {
+            if (selectedKeys().length === 0) {
+               t.checked = true;
+               return;
+            }
+            apply();
+            save();
+         });
+      });
+
+      panel.querySelectorAll('[data-rgc-action]').forEach(function (button) {
+         button.addEventListener('click', function () {
+            if (button.getAttribute('data-rgc-action') === 'all') {
+               setSelection(toggles.map(function (t) { return t.value; }));
+            } else {
+               setSelection(defaults);
+            }
+         });
+      });
+   })();
+</script>
 
 <script>
    window.addEventListener('load', function () {

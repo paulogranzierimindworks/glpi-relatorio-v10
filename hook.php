@@ -31,6 +31,7 @@
  * -------------------------------------------------------------------------
  */
 
+use GlpiPlugin\Relatorioglpicomercial\DashboardColumns;
 use GlpiPlugin\Relatorioglpicomercial\EntityMailConfig;
 use GlpiPlugin\Relatorioglpicomercial\MailConfig;
 use GlpiPlugin\Relatorioglpicomercial\Report;
@@ -148,6 +149,7 @@ function plugin_relatorioglpicomercial_uninstall(): bool
     $migration->executeMigration();
 
     MailConfig::deleteAll();
+    $DB->delete('glpi_configs', ['context' => DashboardColumns::CONTEXT]);
 
     // Core also unregisters plugin tasks on uninstall; doing it here keeps the
     // cleanup explicit and independent of that.

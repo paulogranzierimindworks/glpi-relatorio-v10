@@ -84,13 +84,22 @@ status e analista (todos opcionais, exceto o período). Ele mostra:
 - tabela **Chamados**, com uma linha por chamado e analista.
 
 Entram no painel os chamados com tarefas apontadas no período (data da tarefa)
-**ou** abertos no período. A data de abertura é `date_creation`, com `date` como
-alternativa nos chamados antigos em que ela é nula; o mesmo critério vale para o
-filtro e para a coluna **Abertura**. "Horas Apontadas Período" soma só as
+**ou** abertos no período. No filtro, a data de abertura é `date_creation`, com
+`date` como alternativa nos chamados antigos em que ela é nula. As colunas
+**Abertura** (`date_creation`) e **Data do Chamado** (`date`) são independentes e
+mostram cada campo como está. "Horas Apontadas Período" soma só as
 tarefas do analista dentro do período; "Total Horas Apontadas" é o tempo total
 do chamado.
 
-As colunas seguem `docs/feature/Tabela GLPI.txt`. Duas observações: **Tempo para
+O botão **Colunas**, no topo da tabela, deixa cada usuário escolher quais colunas
+ver (entidade, grupos, origem, localização, prioridade e impacto do GLPI,
+fechamento, última atualização e tempos calculados pelo GLPI, além das colunas
+padrão). A escolha é aplicada na hora e gravada por usuário em `glpi_configs`
+(contexto `plugin:relatorioglpicomercial:dashboard`, via
+`ajax/dashboard_columns.php`); **Restaurar padrão** volta às colunas originais.
+O catálogo de colunas fica em `src/DashboardColumns.php`.
+
+As colunas padrão seguem `docs/feature/Tabela GLPI.txt`. Duas observações: **Tempo para
 Atendimento** mostra o prazo de atendimento (`time_to_own`), e não a data do
 primeiro atendimento do item 10; o **SLA de Atendimento** (item 16) não é
 exibido, o painel traz só o SLA de solução, como na imagem de referência.

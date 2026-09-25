@@ -70,6 +70,19 @@ class DashboardReport
         };
     }
 
+    public static function impactLabel(int $impact): string
+    {
+        return self::urgencyLabel($impact);
+    }
+
+    public static function priorityLabel(int $priority): string
+    {
+        return match ($priority) {
+            6       => 'Crítica',
+            default => self::urgencyLabel($priority),
+        };
+    }
+
     public static function statusLabel(int $status): string
     {
         return match ($status) {
@@ -132,12 +145,24 @@ class DashboardReport
      *     analista: string,
      *     titulo: string,
      *     prioridade: string,
+     *     prioridade_glpi: string,
+     *     impacto: string,
+     *     entidade: string,
+     *     origem: string,
+     *     localizacao: string,
+     *     grupo_solicitante: string,
+     *     grupo_atribuido: string,
      *     status_code: int,
      *     status: string,
      *     abertura: ?string,
+     *     data: ?string,
+     *     atualizacao: ?string,
      *     tempo_atendimento: ?string,
      *     solucao: ?string,
      *     tempo_solucao: ?string,
+     *     fechamento: ?string,
+     *     atendimento_stat_segundos: int,
+     *     solucao_stat_segundos: int,
      *     horas_previstas: string,
      *     total_segundos: int,
      *     periodo_segundos: int,
@@ -211,18 +236,36 @@ class DashboardReport
             'glpi_tickets.type',
             'glpi_tickets.status',
             'glpi_tickets.urgency',
+            'glpi_tickets.priority',
+            'glpi_tickets.impact',
             'glpi_tickets.date',
             'glpi_tickets.date_creation',
+            'glpi_tickets.date_mod',
             'glpi_tickets.time_to_own',
             'glpi_tickets.solvedate',
+            'glpi_tickets.closedate',
             'glpi_tickets.time_to_resolve',
             'glpi_tickets.actiontime',
+            'glpi_tickets.takeintoaccount_delay_stat',
+            'glpi_tickets.solve_delay_stat',
             'glpi_itilcategories.completename AS categoria',
+            'glpi_entities.completename AS entidade',
+            'glpi_requesttypes.name AS origem',
+            'glpi_locations.completename AS localizacao',
             'glpi_ticketsatisfactions.satisfaction AS nota',
         ];
         $joins = [
             'glpi_itilcategories'      => [
                 'ON' => ['glpi_tickets' => 'itilcategories_id', 'glpi_itilcategories' => 'id'],
+            ],
+            'glpi_entities'            => [
+                'ON' => ['glpi_tickets' => 'entities_id', 'glpi_entities' => 'id'],
+            ],
+            'glpi_requesttypes'        => [
+                'ON' => ['glpi_tickets' => 'requesttypes_id', 'glpi_requesttypes' => 'id'],
+            ],
+            'glpi_locations'           => [
+                'ON' => ['glpi_tickets' => 'locations_id', 'glpi_locations' => 'id'],
             ],
             'glpi_ticketsatisfactions' => [
                 'ON' => ['glpi_tickets' => 'id', 'glpi_ticketsatisfactions' => 'tickets_id'],
@@ -287,6 +330,28 @@ class DashboardReport
             }
         }
 
+        // Requester (type 1) and assigned (type 2) groups.
+        $groups = [];
+        $group_rows = $DB->request([
+            'SELECT'     => [
+                'glpi_groups_tickets.tickets_id',
+                'glpi_groups_tickets.type',
+                'glpi_groups.completename AS nome',
+            ],
+            'FROM'       => 'glpi_groups_tickets',
+            'INNER JOIN' => [
+                'glpi_groups' => ['ON' => ['glpi_groups_tickets' => 'groups_id', 'glpi_groups' => 'id']],
+            ],
+            'WHERE'      => [
+                'glpi_groups_tickets.tickets_id' => array_keys($tickets),
+                'glpi_groups_tickets.type'       => [1, 2],
+            ],
+            'ORDER'      => 'glpi_groups.completename ASC',
+        ]);
+        foreach ($group_rows as $group) {
+            $groups[(int) $group['tickets_id']][(int) $group['type']][] = (string) $group['nome'];
+        }
+
         // 4. Names of the technicians that logged tasks.
         $tech_ids = [];
         foreach (array_intersect_key($tasks_by_ticket, $tickets) as $per_tech) {
@@ -310,12 +375,24 @@ class DashboardReport
                 'categoria'            => $ticket['categoria'] !== null ? (string) $ticket['categoria'] : 'Sem categoria',
                 'titulo'               => (string) $ticket['name'],
                 'prioridade'           => self::urgencyLabel((int) $ticket['urgency']),
+                'prioridade_glpi'      => self::priorityLabel((int) $ticket['priority']),
+                'impacto'              => self::impactLabel((int) $ticket['impact']),
+                'entidade'             => (string) ($ticket['entidade'] ?? ''),
+                'origem'               => (string) ($ticket['origem'] ?? ''),
+                'localizacao'          => (string) ($ticket['localizacao'] ?? ''),
+                'grupo_solicitante'    => implode(', ', $groups[$tickets_id][1] ?? []),
+                'grupo_atribuido'      => implode(', ', $groups[$tickets_id][2] ?? []),
                 'status_code'          => $status,
                 'status'               => self::statusLabel($status),
-                'abertura'             => self::nullIfEmpty($ticket['date_creation'] ?? null) ?? self::nullIfEmpty($ticket['date']),
+                'abertura'             => self::nullIfEmpty($ticket['date_creation']),
+                'data'                 => self::nullIfEmpty($ticket['date']),
+                'atualizacao'          => self::nullIfEmpty($ticket['date_mod']),
                 'tempo_atendimento'    => self::nullIfEmpty($ticket['time_to_own']),
                 'solucao'              => self::nullIfEmpty($ticket['solvedate']),
                 'tempo_solucao'        => self::nullIfEmpty($ticket['time_to_resolve']),
+                'fechamento'           => self::nullIfEmpty($ticket['closedate']),
+                'atendimento_stat_segundos' => (int) $ticket['takeintoaccount_delay_stat'],
+                'solucao_stat_segundos'     => (int) $ticket['solve_delay_stat'],
                 'horas_previstas'      => isset($ticket['horas_previstas']) ? trim((string) $ticket['horas_previstas']) : '',
                 'total_segundos'       => (int) $ticket['actiontime'],
                 'sla'                  => self::slaLabel($status, $ticket['time_to_resolve'], $ticket['solvedate'], $now),
