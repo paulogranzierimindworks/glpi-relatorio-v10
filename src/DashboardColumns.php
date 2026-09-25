@@ -58,6 +58,7 @@ class DashboardColumns
         'horas_previstas'   => 'glpi_plugin_fields_ticketprevisodehoras.horasprevistasfieldtwo',
         'total'             => 'glpi_tickets.actiontime',
         'periodo'           => 'SUM(glpi_tickettasks.actiontime) no período',
+        'sla_atendimento'   => 'calculado: glpi_tickets.status, time_to_own e takeintoaccountdate',
         'sla'               => 'calculado: glpi_tickets.status, time_to_resolve e solvedate',
         'nota'              => 'glpi_ticketsatisfactions.satisfaction',
     ];
@@ -108,7 +109,8 @@ class DashboardColumns
             'horas_previstas'   => $def(__('Horas Previstas', 'relatorioglpicomercial'), self::GROUP_HOURS, 'horas_previstas', true, 'rgc-nowrap'),
             'total'             => $def(__('Total Horas Apontadas', 'relatorioglpicomercial'), self::GROUP_HOURS, 'total_fmt', true, 'rgc-nowrap'),
             'periodo'           => $def(__('Horas Apontadas Período', 'relatorioglpicomercial'), self::GROUP_HOURS, 'periodo_fmt', true, 'rgc-nowrap'),
-            'sla'               => $def(__('SLA', 'relatorioglpicomercial'), self::GROUP_TICKET, 'sla', true, 'rgc-nowrap'),
+            'sla_atendimento'   => $def(__('SLA Atendimento', 'relatorioglpicomercial'), self::GROUP_TICKET, 'sla_atendimento', false, 'rgc-nowrap'),
+            'sla'               => $def(__('SLA Solução', 'relatorioglpicomercial'), self::GROUP_TICKET, 'sla', true, 'rgc-nowrap'),
             'nota'              => $def(__('Nota', 'relatorioglpicomercial'), self::GROUP_TICKET, 'nota_fmt', true),
         ];
 

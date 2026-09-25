@@ -24,6 +24,7 @@ class DashboardRenderer
         DashboardReport::SLA_VIOLATED    => '#e15759',
         DashboardReport::SLA_NO_DEADLINE => '#8c9db5',
         DashboardReport::SLA_TO_VALIDATE => '#fdb913',
+        DashboardReport::SLA_IN_PROGRESS => '#59a14f',
     ];
 
     private const TYPE_COLORS = [
@@ -97,6 +98,7 @@ class DashboardRenderer
             'media_satisfacao'    => $summary['media_satisfacao'] !== null
                 ? number_format($summary['media_satisfacao'], 2, ',', '')
                 : '-',
+            'sla_atendimento_series' => self::series($summary['sla_atendimento'], self::SLA_COLORS),
             'sla_series'          => self::series($summary['sla'], self::SLA_COLORS),
             'tipo_series'         => self::series($summary['tipos'], self::TYPE_COLORS),
             'categorias'          => $categorias,

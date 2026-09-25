@@ -366,21 +366,25 @@ class SeedDemoDataCommand extends AbstractCommand
             // rewrite the ticket status (e.g. bumping it to ASSIGNED once a
             // technician actor or a done task is present), so the intended
             // status/dates are (re-)applied here, after all side effects have run.
-            [$time_to_resolve, $solvedate, $closedate] = $this->computeSlaDates($date, $item['sla'], $item['status']);
-            $this->applyHistoricalDates((int) $tickets_id, $item['status'], $date_str, $time_to_resolve, $solvedate, $closedate);
+            [$time_to_resolve, $solvedate, $closedate, $time_to_own, $takeintoaccountdate] = $this->computeSlaDates($date, $item['sla'], $item['status']);
+            $this->applyHistoricalDates((int) $tickets_id, $item['status'], $date_str, $time_to_resolve, $solvedate, $closedate, $time_to_own, $takeintoaccountdate);
         }
 
         return $created;
     }
 
     /**
-     * @return array{0: ?string, 1: ?string, 2: ?string} [time_to_resolve, solvedate, closedate]
+     * @return array{0: ?string, 1: ?string, 2: ?string, 3: ?string, 4: ?string} [time_to_resolve, solvedate, closedate, time_to_own, takeintoaccountdate]
      */
     private function computeSlaDates(DateTime $open_date, ?string $sla, int $status): array
     {
         if ($sla === null) {
-            return [null, null, null];
+            return [null, null, null, null, null];
         }
+
+        // Attendance SLA: 4h deadline, first response 1h (on time) or 6h (late) after opening.
+        $time_to_own = (clone $open_date)->add(new DateInterval('PT4H'));
+        $takeintoaccountdate = (clone $open_date)->add(new DateInterval($sla === 'late' ? 'PT6H' : 'PT1H'));
 
         $time_to_resolve = (clone $open_date)->add(new DateInterval('P2D'));
         $solvedate = $sla === 'late'
@@ -394,10 +398,21 @@ class SeedDemoDataCommand extends AbstractCommand
             $time_to_resolve->format('Y-m-d H:i:s'),
             $solvedate->format('Y-m-d H:i:s'),
             $closedate?->format('Y-m-d H:i:s'),
+            $time_to_own->format('Y-m-d H:i:s'),
+            $takeintoaccountdate->format('Y-m-d H:i:s'),
         ];
     }
 
-    private function applyHistoricalDates(int $tickets_id, int $status, string $date, ?string $time_to_resolve, ?string $solvedate, ?string $closedate): void
+    private function applyHistoricalDates(
+        int $tickets_id,
+        int $status,
+        string $date,
+        ?string $time_to_resolve,
+        ?string $solvedate,
+        ?string $closedate,
+        ?string $time_to_own,
+        ?string $takeintoaccountdate
+    ): void
     {
         global $DB;
 
@@ -407,9 +422,11 @@ class SeedDemoDataCommand extends AbstractCommand
         $DB->update('glpi_tickets', [
             'status'           => $status,
             'date'             => $date,
-            'time_to_resolve'  => $time_to_resolve,
-            'solvedate'        => $solvedate,
-            'closedate'        => $closedate,
+            'time_to_own'         => $time_to_own,
+            'takeintoaccountdate' => $takeintoaccountdate,
+            'time_to_resolve'     => $time_to_resolve,
+            'solvedate'           => $solvedate,
+            'closedate'           => $closedate,
         ], ['id' => $tickets_id]);
     }
 }

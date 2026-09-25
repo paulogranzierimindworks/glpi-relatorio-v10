@@ -31,10 +31,11 @@ use QueryExpression;
  */
 class DashboardReport
 {
-    public const SLA_OK          = 'No Prazo';
+    public const SLA_OK          = 'No prazo';
     public const SLA_VIOLATED    = 'Violado';
     public const SLA_NO_DEADLINE = 'Sem prazo definido';
     public const SLA_TO_VALIDATE = 'A validar';
+    public const SLA_IN_PROGRESS = 'Em andamento';
 
     /** Status filter keys => glpi_tickets.status values. */
     public const STATUS_GROUPS = [
@@ -96,31 +97,32 @@ class DashboardReport
     }
 
     /**
-     * SLA of the solution deadline (Tabela GLPI, item 17).
+     * SLA of a deadline, shared by both SLAs (Tabela GLPI, items 16 and 17):
+     * the rule is the same, only the deadline and the date it is compared with
+     * change.
      *
-     * Closed tickets follow the table literally. Tickets still open are
-     * "Violado" once the deadline has passed and "No Prazo" otherwise, which is
-     * what the reference dashboard shows for pending tickets.
+     *  - attendance: time_to_own vs takeintoaccountdate;
+     *  - solution:   time_to_resolve vs solvedate.
      *
-     * @param string $now current time as "Y-m-d H:i:s"
+     * Tickets that are not solved/closed yet are "Em andamento".
      */
-    public static function slaLabel(int $status, ?string $time_to_resolve, ?string $solvedate, string $now): string
+    public static function slaLabel(int $status, ?string $deadline, ?string $reached_at): string
     {
-        $time_to_resolve = self::nullIfEmpty($time_to_resolve);
-        $solvedate       = self::nullIfEmpty($solvedate);
+        if (!in_array($status, [5, 6], true)) {
+            return self::SLA_IN_PROGRESS;
+        }
 
-        if ($time_to_resolve === null) {
+        $deadline   = self::nullIfEmpty($deadline);
+        $reached_at = self::nullIfEmpty($reached_at);
+
+        if ($deadline === null) {
             return self::SLA_NO_DEADLINE;
         }
-
-        if (in_array($status, [5, 6], true)) {
-            if ($solvedate === null) {
-                return self::SLA_TO_VALIDATE;
-            }
-            return $solvedate > $time_to_resolve ? self::SLA_VIOLATED : self::SLA_OK;
+        if ($reached_at === null) {
+            return self::SLA_TO_VALIDATE;
         }
 
-        return $now > $time_to_resolve ? self::SLA_VIOLATED : self::SLA_OK;
+        return $reached_at > $deadline ? self::SLA_VIOLATED : self::SLA_OK;
     }
 
     /**
@@ -166,6 +168,7 @@ class DashboardReport
      *     horas_previstas: string,
      *     total_segundos: int,
      *     periodo_segundos: int,
+     *     sla_atendimento: string,
      *     sla: string,
      *     nota: ?int,
      * }>
@@ -242,6 +245,7 @@ class DashboardReport
             'glpi_tickets.date_creation',
             'glpi_tickets.date_mod',
             'glpi_tickets.time_to_own',
+            'glpi_tickets.takeintoaccountdate',
             'glpi_tickets.solvedate',
             'glpi_tickets.closedate',
             'glpi_tickets.time_to_resolve',
@@ -363,7 +367,6 @@ class DashboardReport
         }
         $tech_names = self::userNames(array_values($tech_ids));
 
-        $now  = date('Y-m-d H:i:s');
         $rows = [];
         foreach ($tickets as $tickets_id => $ticket) {
             $status = (int) $ticket['status'];
@@ -395,7 +398,8 @@ class DashboardReport
                 'solucao_stat_segundos'     => (int) $ticket['solve_delay_stat'],
                 'horas_previstas'      => isset($ticket['horas_previstas']) ? trim((string) $ticket['horas_previstas']) : '',
                 'total_segundos'       => (int) $ticket['actiontime'],
-                'sla'                  => self::slaLabel($status, $ticket['time_to_resolve'], $ticket['solvedate'], $now),
+                'sla_atendimento'      => self::slaLabel($status, $ticket['time_to_own'], $ticket['takeintoaccountdate']),
+                'sla'                  => self::slaLabel($status, $ticket['time_to_resolve'], $ticket['solvedate']),
                 'nota'                 => $ticket['nota'] !== null ? (int) $ticket['nota'] : null,
             ];
 
@@ -445,6 +449,7 @@ class DashboardReport
      *     no_prazo: int,
      *     media_satisfacao: ?float,
      *     sla: array<string, int>,
+     *     sla_atendimento: array<string, int>,
      *     tipos: array<string, int>,
      *     categorias: list<array{categoria: string, segundos: int}>,
      *     total_periodo_segundos: int,
@@ -453,12 +458,15 @@ class DashboardReport
     public static function summarize(array $rows): array
     {
         $seen = [];
-        $sla = [
+        $empty_sla = [
             self::SLA_OK          => 0,
             self::SLA_VIOLATED    => 0,
-            self::SLA_NO_DEADLINE => 0,
+            self::SLA_IN_PROGRESS => 0,
             self::SLA_TO_VALIDATE => 0,
+            self::SLA_NO_DEADLINE => 0,
         ];
+        $sla             = $empty_sla;
+        $sla_atendimento = $empty_sla;
         $tipos = [];
         $categorias = [];
         $total_periodo = 0;
@@ -484,6 +492,7 @@ class DashboardReport
 
             $summary['total']++;
             $sla[$row['sla']] = ($sla[$row['sla']] ?? 0) + 1;
+            $sla_atendimento[$row['sla_atendimento']] = ($sla_atendimento[$row['sla_atendimento']] ?? 0) + 1;
             $tipos[$row['tipo']] = ($tipos[$row['tipo']] ?? 0) + 1;
             if ($row['nota'] !== null) {
                 $notas[] = (int) $row['nota'];
@@ -516,6 +525,7 @@ class DashboardReport
             'no_prazo'               => $sla[self::SLA_OK],
             'media_satisfacao'       => count($notas) > 0 ? array_sum($notas) / count($notas) : null,
             'sla'                    => array_filter($sla, static fn (int $count): bool => $count > 0),
+            'sla_atendimento'        => array_filter($sla_atendimento, static fn (int $count): bool => $count > 0),
             'tipos'                  => $tipos,
             'categorias'             => $categorias_list,
             'total_periodo_segundos' => $total_periodo,

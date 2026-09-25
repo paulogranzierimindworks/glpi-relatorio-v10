@@ -18,8 +18,6 @@ use PHPUnit\Framework\TestCase;
 
 class DashboardReportTest extends TestCase
 {
-    private const NOW = '2026-09-23 12:00:00';
-
     /**
      * @param array<string, mixed> $overrides
      * @return array<string, mixed>
@@ -32,6 +30,7 @@ class DashboardReportTest extends TestCase
             'categoria'        => 'DBA',
             'status_code'      => 4,
             'sla'              => DashboardReport::SLA_OK,
+            'sla_atendimento'  => DashboardReport::SLA_OK,
             'nota'             => null,
             'periodo_segundos' => 0,
         ];
@@ -55,45 +54,48 @@ class DashboardReportTest extends TestCase
         $this->assertSame('Fechado', DashboardReport::statusLabel(6));
     }
 
+    public function testSlaOfTicketsNotSolvedYetIsInProgress(): void
+    {
+        foreach ([1, 2, 3, 4] as $status) {
+            $this->assertSame(
+                DashboardReport::SLA_IN_PROGRESS,
+                DashboardReport::slaLabel($status, '2026-09-01 09:00:00', null),
+                "status $status"
+            );
+        }
+        $this->assertSame(
+            DashboardReport::SLA_IN_PROGRESS,
+            DashboardReport::slaLabel(2, null, null)
+        );
+    }
+
     public function testSlaWithoutDeadline(): void
     {
         $this->assertSame(
             DashboardReport::SLA_NO_DEADLINE,
-            DashboardReport::slaLabel(5, null, '2026-09-10 10:00:00', self::NOW)
+            DashboardReport::slaLabel(5, null, '2026-09-10 10:00:00')
         );
         $this->assertSame(
             DashboardReport::SLA_NO_DEADLINE,
-            DashboardReport::slaLabel(4, '', null, self::NOW)
+            DashboardReport::slaLabel(6, '', null)
         );
     }
 
-    public function testSlaOfClosedTickets(): void
+    public function testSlaOfSolvedTicketsComparesTheReachedDateWithTheDeadline(): void
     {
         $deadline = '2026-09-20 09:00:00';
 
         $this->assertSame(
             DashboardReport::SLA_TO_VALIDATE,
-            DashboardReport::slaLabel(5, $deadline, null, self::NOW)
+            DashboardReport::slaLabel(5, $deadline, null)
         );
         $this->assertSame(
             DashboardReport::SLA_OK,
-            DashboardReport::slaLabel(6, $deadline, '2026-09-20 09:00:00', self::NOW)
+            DashboardReport::slaLabel(6, $deadline, '2026-09-20 09:00:00')
         );
         $this->assertSame(
             DashboardReport::SLA_VIOLATED,
-            DashboardReport::slaLabel(6, $deadline, '2026-09-20 09:00:01', self::NOW)
-        );
-    }
-
-    public function testSlaOfOpenTicketsDependsOnTheDeadline(): void
-    {
-        $this->assertSame(
-            DashboardReport::SLA_OK,
-            DashboardReport::slaLabel(4, '2026-09-30 09:00:00', null, self::NOW)
-        );
-        $this->assertSame(
-            DashboardReport::SLA_VIOLATED,
-            DashboardReport::slaLabel(2, '2026-09-01 09:00:00', null, self::NOW)
+            DashboardReport::slaLabel(6, $deadline, '2026-09-20 09:00:01')
         );
     }
 
@@ -102,7 +104,7 @@ class DashboardReportTest extends TestCase
         $rows = [
             $this->row(['id' => 10, 'status_code' => 4, 'periodo_segundos' => 900, 'nota' => 5]),
             $this->row(['id' => 10, 'status_code' => 4, 'periodo_segundos' => 1800, 'nota' => 5]),
-            $this->row(['id' => 11, 'status_code' => 2, 'tipo' => 'Incidente', 'sla' => DashboardReport::SLA_VIOLATED, 'categoria' => 'Servidores', 'periodo_segundos' => 600, 'nota' => 4]),
+            $this->row(['id' => 11, 'status_code' => 2, 'tipo' => 'Incidente', 'sla' => DashboardReport::SLA_VIOLATED, 'sla_atendimento' => DashboardReport::SLA_IN_PROGRESS, 'categoria' => 'Servidores', 'periodo_segundos' => 600, 'nota' => 4]),
             $this->row(['id' => 12, 'status_code' => 6, 'periodo_segundos' => 0]),
             $this->row(['id' => 13, 'status_code' => 5, 'periodo_segundos' => 0]),
         ];
@@ -118,6 +120,7 @@ class DashboardReportTest extends TestCase
         $this->assertSame(3300, $summary['total_periodo_segundos']);
         $this->assertEqualsWithDelta(4.5, $summary['media_satisfacao'], 0.0001);
         $this->assertSame([DashboardReport::SLA_OK => 3, DashboardReport::SLA_VIOLATED => 1], $summary['sla']);
+        $this->assertSame([DashboardReport::SLA_OK => 3, DashboardReport::SLA_IN_PROGRESS => 1], $summary['sla_atendimento']);
         $this->assertSame(['Requisição' => 3, 'Incidente' => 1], $summary['tipos']);
     }
 
@@ -146,6 +149,7 @@ class DashboardReportTest extends TestCase
         $this->assertSame(0, $summary['total']);
         $this->assertNull($summary['media_satisfacao']);
         $this->assertSame([], $summary['sla']);
+        $this->assertSame([], $summary['sla_atendimento']);
         $this->assertSame([], $summary['categorias']);
     }
 

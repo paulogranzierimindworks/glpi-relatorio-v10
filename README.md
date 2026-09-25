@@ -77,10 +77,10 @@ O menu **Ferramentas > Dashboard de Chamados** (`front/dashboard.php`) abre um
 painel que segue o tema do GLPI, com filtros de entidade, período, categoria,
 status e analista (todos opcionais, exceto o período). Ele mostra:
 
-- rosca de **SLA** e rosca de **Tipo do chamado**;
+- roscas de **SLA Atendimento** e **SLA Solução** (empilhadas) e rosca de **Tipo do chamado**;
 - **Horas Categorias**: horas apontadas no período por categoria;
-- KPIs de status (Em Atendimento, Pendente, Fechado, Total), SLA (Violado, No
-  Prazo) e **Média de Satisfação**;
+- KPIs de status (Em Atendimento, Pendente, Fechado, Total), SLA de solução (Violado, No
+  prazo) e **Média de Satisfação**;
 - tabela **Chamados**, com uma linha por chamado e analista.
 
 Entram no painel os chamados com tarefas apontadas no período (data da tarefa)
@@ -99,16 +99,24 @@ padrão). A escolha é aplicada na hora e gravada por usuário em `glpi_configs`
 `ajax/dashboard_columns.php`); **Restaurar padrão** volta às colunas originais.
 O catálogo de colunas fica em `src/DashboardColumns.php`.
 
-As colunas padrão seguem `docs/feature/Tabela GLPI.txt`. Duas observações: **Tempo para
+As colunas padrão seguem `docs/feature/Tabela GLPI.txt`. Uma observação: **Tempo para
 Atendimento** mostra o prazo de atendimento (`time_to_own`), e não a data do
-primeiro atendimento do item 10; o **SLA de Atendimento** (item 16) não é
-exibido, o painel traz só o SLA de solução, como na imagem de referência.
+primeiro atendimento do item 10. A coluna **SLA Atendimento** (item 16) existe no
+seletor de colunas, mas vem desmarcada; **SLA Solução** (item 17) é a coluna padrão.
 
-Regras de SLA (prazo de solução): chamado solucionado/fechado é **Violado** se
-`solvedate` passou de `time_to_resolve`, **A validar** se ainda não tem data de
-solução e **Sem prazo definido** se não há prazo. Chamado em andamento é
-**Violado** se o prazo já passou e **No Prazo** caso contrário. Os status
-seguem `docs/feature/Tabela GLPI.txt` (2 e 3 = Em atendimento).
+Regras de SLA (itens 16 e 17 da tabela), iguais para os dois:
+
+| Situação | Resultado |
+| --- | --- |
+| status diferente de 5 (Solucionado) e 6 (Fechado) | **Em andamento** |
+| sem prazo (`time_to_own` / `time_to_resolve`) | **Sem prazo definido** |
+| sem data de atendimento / solução (`takeintoaccountdate` / `solvedate`) | **A validar** |
+| data de atendimento / solução maior que o prazo | **Violado** |
+| demais casos | **No prazo** |
+
+O SLA de atendimento compara `takeintoaccountdate` com `time_to_own`; o de solução
+compara `solvedate` com `time_to_resolve`. Os KPIs Violado e No prazo usam o SLA de
+solução. Os status seguem `docs/feature/Tabela GLPI.txt` (2 e 3 = Em atendimento).
 
 A coluna **Horas Previstas** vem do plugin *Fields*
 (`glpi_plugin_fields_ticketprevisodehoras.horasprevistasfieldtwo`) e fica vazia
