@@ -16,7 +16,7 @@ use GlpiPlugin\Relatorioglpicomercial\DashboardRenderer;
 use GlpiPlugin\Relatorioglpicomercial\DashboardReport;
 use GlpiPlugin\Relatorioglpicomercial\Report;
 
-Session::checkRight(Report::RIGHTNAME, READ);
+Session::checkRight(Report::DASHBOARD_RIGHTNAME, READ);
 
 Html::header(DashboardMenu::getMenuName(), $_SERVER['PHP_SELF'], 'tools', DashboardMenu::class);
 Html::requireJs('charts');

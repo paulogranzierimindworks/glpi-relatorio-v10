@@ -50,6 +50,41 @@ function plugin_relatorioglpicomercial_install(): bool
     // (typically Super-Admin/Admin) are granted READ + UPDATE on it automatically.
     $migration->addRight(Report::RIGHTNAME, READ | UPDATE);
 
+    // The dashboard used to be covered by the report READ right. When the
+    // dashboard right is created on an existing installation, carry that access
+    // over so nobody loses the dashboard; afterwards the two are independent.
+    $dashboard_right_exists = countElementsInTable('glpi_profilerights', ['name' => Report::DASHBOARD_RIGHTNAME]) > 0;
+    $migration->addRight(Report::DASHBOARD_RIGHTNAME, READ);
+
+    if (!$dashboard_right_exists) {
+        $report_readers = [];
+        foreach (
+            $DB->request([
+                'SELECT' => 'profiles_id',
+                'FROM'   => 'glpi_profilerights',
+                'WHERE'  => [
+                    'name' => Report::RIGHTNAME,
+                    new QueryExpression($DB::quoteName('rights') . ' & ' . READ . ' = ' . READ),
+                ],
+            ]) as $row
+        ) {
+            $report_readers[] = (int) $row['profiles_id'];
+        }
+
+        if ($report_readers !== []) {
+            $DB->update(
+                'glpi_profilerights',
+                ['rights' => READ],
+                ['name' => Report::DASHBOARD_RIGHTNAME, 'profiles_id' => $report_readers]
+            );
+            $DB->update(
+                'glpi_profiles',
+                ['last_rights_update' => Session::getCurrentTime()],
+                ['id' => $report_readers]
+            );
+        }
+    }
+
     // addRight() only inserts rows that do not exist yet, so an installation
     // made before the scheduled email existed would keep a READ-only right.
     // Grant UPDATE there too, but only to the profiles allowed to configure GLPI.
@@ -155,7 +190,7 @@ function plugin_relatorioglpicomercial_uninstall(): bool
     // cleanup explicit and independent of that.
     CronTask::unregister('relatorioglpicomercial');
 
-    $DB->delete('glpi_profilerights', ['name' => Report::RIGHTNAME]);
+    $DB->delete('glpi_profilerights', ['name' => [Report::RIGHTNAME, Report::DASHBOARD_RIGHTNAME]]);
 
     return true;
 }

@@ -17,7 +17,7 @@ use GlpiPlugin\Relatorioglpicomercial\Report;
 header('Content-Type: application/json; charset=UTF-8');
 Html::header_nocache();
 
-Session::checkRight(Report::RIGHTNAME, READ);
+Session::checkRight(Report::DASHBOARD_RIGHTNAME, READ);
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
     http_response_code(405);

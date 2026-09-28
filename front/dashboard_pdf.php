@@ -16,7 +16,7 @@ use GlpiPlugin\Relatorioglpicomercial\DashboardReport;
 use GlpiPlugin\Relatorioglpicomercial\Report;
 use GlpiPlugin\Relatorioglpicomercial\ReportPdf;
 
-Session::checkRight(Report::RIGHTNAME, READ);
+Session::checkRight(Report::DASHBOARD_RIGHTNAME, READ);
 
 $filters = DashboardReport::filtersFromRequest($_GET);
 

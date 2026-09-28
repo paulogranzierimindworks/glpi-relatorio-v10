@@ -49,12 +49,21 @@ class Profile extends CommonGLPI
 
     public static function showForProfile(int $profiles_id): void
     {
-        $current  = GlpiProfileRight::getProfileRights($profiles_id, [Report::RIGHTNAME]);
-        $rights   = (int) ($current[Report::RIGHTNAME] ?? 0);
-        $can_edit = GlpiProfile::canUpdate();
+        $current          = GlpiProfileRight::getProfileRights($profiles_id, [Report::RIGHTNAME, Report::DASHBOARD_RIGHTNAME]);
+        $rights           = (int) ($current[Report::RIGHTNAME] ?? 0);
+        $dashboard_rights = (int) ($current[Report::DASHBOARD_RIGHTNAME] ?? 0);
+        $can_edit         = GlpiProfile::canUpdate();
 
         echo "<form method='post' action='/plugins/relatorioglpicomercial/front/profile.form.php'>";
         echo "<table class='table'><tbody>";
+
+        echo "<tr><th>" . __s('Visualizar o dashboard de chamados', 'relatorioglpicomercial') . "</th><td>";
+        Html::showCheckbox([
+            'name'     => 'right_dashboard',
+            'checked'  => (bool) ($dashboard_rights & READ),
+            'disabled' => !$can_edit,
+        ]);
+        echo "</td></tr>";
 
         echo "<tr><th>" . __s('Visualizar o relatório comercial', 'relatorioglpicomercial') . "</th><td>";
         Html::showCheckbox([

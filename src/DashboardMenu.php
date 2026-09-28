@@ -26,7 +26,7 @@ class DashboardMenu extends CommonGLPI
 
     public static function canView(): bool
     {
-        return Session::haveRight(Report::RIGHTNAME, READ);
+        return Session::haveRight(Report::DASHBOARD_RIGHTNAME, READ);
     }
 
     public static function getMenuContent(): array|false

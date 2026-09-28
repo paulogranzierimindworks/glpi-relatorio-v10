@@ -24,6 +24,9 @@ class Report
 {
     public const RIGHTNAME = 'plugin_relatorioglpicomercial_report';
 
+    /** Separate right so a profile can see the ticket dashboard without the commercial report. */
+    public const DASHBOARD_RIGHTNAME = 'plugin_relatorioglpicomercial_dashboard';
+
     /**
      * Validate a "Y-m-d" date string (round-trip check, rejects malformed input).
      */

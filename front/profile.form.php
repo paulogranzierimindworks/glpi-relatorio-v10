@@ -20,7 +20,10 @@ $profiles_id = (int) ($_POST['id'] ?? 0);
 if (isset($_POST['update'])) {
     $rights = (isset($_POST['right_read']) ? READ : 0)
         | (isset($_POST['right_update']) ? UPDATE : 0);
-    ProfileRight::updateProfileRights($profiles_id, [Report::RIGHTNAME => $rights]);
+    ProfileRight::updateProfileRights($profiles_id, [
+        Report::RIGHTNAME           => $rights,
+        Report::DASHBOARD_RIGHTNAME => isset($_POST['right_dashboard']) ? READ : 0,
+    ]);
 }
 
 Html::back();
