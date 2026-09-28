@@ -14,7 +14,7 @@ namespace GlpiPlugin\Relatorioglpicomercial;
 use GLPIPDF;
 
 /**
- * A4 portrait document with the report chrome (title band, KPI cards, footer)
+ * A4 document (portrait unless told otherwise) with the report chrome (title band, KPI cards, footer)
  * drawn through TCPDF's native API. Only the data tables go through
  * writeHTML(), which is the part TCPDF's HTML engine handles reliably.
  */
@@ -31,15 +31,20 @@ class ReportPdfDocument extends GLPIPDF
     private string $period;
     private string $generated_at;
 
-    public function __construct(string $eyebrow, string $heading, string $period, string $generated_at)
-    {
+    public function __construct(
+        string $eyebrow,
+        string $heading,
+        string $period,
+        string $generated_at,
+        string $orientation = 'P'
+    ) {
         $this->eyebrow      = $eyebrow;
         $this->heading      = $heading;
         $this->period       = $period;
         $this->generated_at = $generated_at;
 
         parent::__construct([
-            'orientation'   => 'P',
+            'orientation'   => $orientation,
             'format'        => 'A4',
             'font'          => 'helvetica',
             'font_size'     => 8,
@@ -141,7 +146,7 @@ class ReportPdfDocument extends GLPIPDF
             $this->SetTextColor(110, 118, 129);
             $this->setFontSpacing(0.35);
             $this->SetXY($x + 5, $top + 3.5);
-            $this->Cell($width - 10, 4, mb_strtoupper($card['label']), 0, 0, 'L');
+            $this->Cell($width - 10, 4, mb_strtoupper($card['label']), 0, 0, 'L', false, '', 1);
             $this->setFontSpacing(0);
 
             $this->SetFont('helvetica', 'B', 15);
@@ -153,6 +158,125 @@ class ReportPdfDocument extends GLPIPDF
         $this->SetTextColor(0, 0, 0);
         $this->SetFont('helvetica', '', 8);
         $this->SetXY(self::MARGIN_X, $top + $height + 6);
+    }
+
+    /**
+     * Row of panels, each with a donut chart, its total in the middle and a
+     * legend (label, percentage and count) beside it. Drawn natively because
+     * TCPDF's HTML engine cannot render charts.
+     *
+     * @param array<int, array{title: string, caption: string, series: list<array{label: string, value: int, pct: string, color: string}>}> $panels
+     */
+    public function drawDonutPanels(array $panels): void
+    {
+        if ($panels === []) {
+            return;
+        }
+
+        $gap    = 6.0;
+        $height = 46.0;
+        $radius = 15.0;
+        $ring   = 6.5;
+        $width  = ($this->contentWidth() - ($gap * (count($panels) - 1))) / count($panels);
+
+        $this->checkPageBreak($height + 6);
+        $top = $this->GetY();
+
+        foreach (array_values($panels) as $index => $panel) {
+            $x = self::MARGIN_X + ($index * ($width + $gap));
+
+            $this->SetFillColor(245, 246, 248);
+            $this->RoundedRect($x, $top, $width, $height, 1.8, '1111', 'F');
+
+            $this->SetFont('helvetica', 'B', 7);
+            $this->SetTextColor(110, 118, 129);
+            $this->setFontSpacing(0.35);
+            $this->SetXY($x + 5, $top + 3.5);
+            $this->Cell($width - 10, 4, mb_strtoupper($panel['title']), 0, 0, 'L', false, '', 1);
+            $this->setFontSpacing(0);
+
+            if ($panel['series'] === []) {
+                $this->SetFont('helvetica', '', 8);
+                $this->SetXY($x, $top + ($height / 2));
+                $this->Cell($width, 4, 'Sem dados', 0, 0, 'C');
+                continue;
+            }
+
+            $cx = $x + 5 + $radius;
+            $cy = $top + 10 + $radius + 2;
+            $this->drawDonut($cx, $cy, $radius, $ring, $panel['series'], $panel['caption']);
+            $this->drawLegend($cx + $radius + 6, $top + 11, $x + $width - 4, $panel['series']);
+        }
+
+        $this->SetTextColor(0, 0, 0);
+        $this->SetFont('helvetica', '', 8);
+        $this->SetXY(self::MARGIN_X, $top + $height + 6);
+    }
+
+    /**
+     * @param list<array{label: string, value: int, pct: string, color: string}> $series
+     */
+    private function drawDonut(float $cx, float $cy, float $radius, float $ring, array $series, string $caption): void
+    {
+        $total = array_sum(array_column($series, 'value'));
+        $angle = 0.0;
+
+        $this->SetDrawColor(245, 246, 248);
+        $this->SetLineWidth(0.4);
+        foreach ($series as $item) {
+            if ($item['value'] <= 0 || $total <= 0) {
+                continue;
+            }
+
+            $this->SetFillColor(...self::hexToRgb($item['color']));
+            $sweep = ($item['value'] / $total) * 360;
+            if ($sweep >= 360) {
+                $this->Circle($cx, $cy, $radius, 0, 360, 'F');
+            } else {
+                $this->PieSector($cx, $cy, $radius, $angle, $angle + $sweep, 'FD', true, 90);
+            }
+            $angle += $sweep;
+        }
+
+        // The hole: same color as the panel background.
+        $this->SetFillColor(245, 246, 248);
+        $this->Circle($cx, $cy, $radius - $ring, 0, 360, 'F');
+
+        $inner = 2 * ($radius - $ring);
+        $this->SetTextColor(...self::COLOR_BRAND);
+        $this->SetFont('helvetica', 'B', 12);
+        $this->SetXY($cx - ($inner / 2), $cy - 4.5);
+        $this->Cell($inner, 5, (string) $total, 0, 0, 'C');
+
+        $this->SetTextColor(110, 118, 129);
+        $this->SetFont('helvetica', 'B', 5);
+        $this->SetXY($cx - ($inner / 2), $cy + 1);
+        $this->Cell($inner, 3, mb_strtoupper($caption), 0, 0, 'C', false, '', 1);
+    }
+
+    /**
+     * @param list<array{label: string, value: int, pct: string, color: string}> $series
+     */
+    private function drawLegend(float $x, float $y, float $right, array $series): void
+    {
+        $line  = 5.0;
+        $value = 20.0;
+        $label = max(1.0, $right - $x - 4 - $value);
+
+        foreach ($series as $index => $item) {
+            $top = $y + ($index * $line);
+
+            $this->SetFillColor(...self::hexToRgb($item['color']));
+            $this->Circle($x + 1.2, $top + 2.3, 1.2, 0, 360, 'F');
+
+            $this->SetFont('helvetica', '', 7);
+            $this->SetTextColor(51, 65, 85);
+            $this->SetXY($x + 4, $top);
+            $this->Cell($label, 4.6, $item['label'], 0, 0, 'L', false, '', 1);
+
+            $this->SetFont('helvetica', 'B', 7);
+            $this->Cell($value, 4.6, $item['pct'] . ' (' . $item['value'] . ')', 0, 0, 'R', false, '', 1);
+        }
     }
 
     public function writeBody(string $html): void

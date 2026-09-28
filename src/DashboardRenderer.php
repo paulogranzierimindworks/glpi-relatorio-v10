@@ -38,7 +38,7 @@ class DashboardRenderer
     /**
      * @param list<array<string, mixed>> $rows rows from DashboardReport::getRows()
      */
-    public static function render(array $rows, string $date_start, string $date_end): string
+    public static function render(array $rows, string $date_start, string $date_end, ?string $pdf_url = null): string
     {
         $visible = DashboardColumns::getVisibleKeys((int) \Session::getLoginUserID());
         $columns = DashboardColumns::describe($visible);
@@ -47,6 +47,7 @@ class DashboardRenderer
             '@relatorioglpicomercial/report_dashboard.html.twig',
             self::prepareData($rows, $date_start, $date_end)
             + [
+                'pdf_url'         => $pdf_url,
                 'can_link_item'   => \Session::haveRight('ticket', READ),
                 'columns'         => $columns,
                 'column_groups'   => DashboardColumns::getGroups(),

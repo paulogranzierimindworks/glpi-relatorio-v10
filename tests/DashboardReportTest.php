@@ -205,6 +205,27 @@ class DashboardReportTest extends TestCase
         $this->assertSame('0%', DashboardRenderer::formatPercent(0.0));
     }
 
+    public function testFiltersFromRequestNormalizesInput(): void
+    {
+        $filters = DashboardReport::filtersFromRequest([
+            'entities_id'       => '3',
+            'itilcategories_id' => 'abc',
+            'status'            => 'inexistente',
+            'date_start'        => '2026-09-01',
+            'date_end'          => '2026-09-30',
+        ]);
+
+        $this->assertSame(3, $filters['entities_id']);
+        $this->assertSame(0, $filters['itilcategories_id']);
+        $this->assertSame(0, $filters['users_id_tech']);
+        $this->assertSame('', $filters['status'], 'unknown status groups are dropped');
+        $this->assertSame('2026-09-01', $filters['date_start']);
+        $this->assertSame('2026-09-30', $filters['date_end']);
+
+        $this->assertSame('pendente', DashboardReport::filtersFromRequest(['status' => 'pendente'])['status']);
+        $this->assertSame(date('Y-m-01'), DashboardReport::filtersFromRequest([])['date_start']);
+    }
+
     public function testSeriesComputesPercentagesAndColors(): void
     {
         $series = DashboardRenderer::series(

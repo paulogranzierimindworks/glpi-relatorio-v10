@@ -74,7 +74,15 @@
 <div class="rgc-dash">
    <div class="rgc-dash-title">
       <h2>{{ __('Dashboard de Chamados', 'relatorioglpicomercial') }}</h2>
-      <small>{{ date_start_fmt }} – {{ date_end_fmt }}</small>
+      <div class="d-flex align-items-center gap-2">
+         <small>{{ date_start_fmt }} – {{ date_end_fmt }}</small>
+         {% if pdf_url is not empty %}
+            <a class="btn btn-sm btn-outline-secondary" href="{{ pdf_url }}" target="_blank" rel="noopener">
+               <i class="ti ti-file-type-pdf"></i>
+               <span>{{ __('Exportar PDF', 'relatorioglpicomercial') }}</span>
+            </a>
+         {% endif %}
+      </div>
    </div>
 
    <div class="rgc-kpis">

@@ -99,6 +99,10 @@ padrão). A escolha é aplicada na hora e gravada por usuário em `glpi_configs`
 `ajax/dashboard_columns.php`); **Restaurar padrão** volta às colunas originais.
 O catálogo de colunas fica em `src/DashboardColumns.php`.
 
+O botão **Exportar PDF**, no topo do painel, baixa o dashboard em PDF A4 paisagem
+(`front/dashboard_pdf.php`) com os mesmos filtros: KPIs, roscas, horas por
+categoria e a tabela de chamados, que usa as colunas escolhidas pelo usuário.
+
 As colunas padrão seguem `docs/feature/Tabela GLPI.txt`. Uma observação: **Tempo para
 Atendimento** mostra o prazo de atendimento (`time_to_own`), e não a data do
 primeiro atendimento do item 10. A coluna **SLA Atendimento** (item 16) existe no

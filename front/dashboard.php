@@ -21,16 +21,13 @@ Session::checkRight(Report::RIGHTNAME, READ);
 Html::header(DashboardMenu::getMenuName(), $_SERVER['PHP_SELF'], 'tools', DashboardMenu::class);
 Html::requireJs('charts');
 
-$entities_id       = (int) ($_GET['entities_id'] ?? 0);
-$itilcategories_id = (int) ($_GET['itilcategories_id'] ?? 0);
-$users_id_tech     = (int) ($_GET['users_id_tech'] ?? 0);
-$status            = (string) ($_GET['status'] ?? '');
-$date_start        = (string) ($_GET['date_start'] ?? date('Y-m-01'));
-$date_end          = (string) ($_GET['date_end'] ?? date('Y-m-d'));
-
-if (!isset(DashboardReport::STATUS_GROUPS[$status])) {
-    $status = '';
-}
+$filters           = DashboardReport::filtersFromRequest($_GET);
+$entities_id       = $filters['entities_id'];
+$itilcategories_id = $filters['itilcategories_id'];
+$users_id_tech     = $filters['users_id_tech'];
+$status            = $filters['status'];
+$date_start        = $filters['date_start'];
+$date_end          = $filters['date_end'];
 
 $has_valid_dates = Report::isValidDate($date_start) && Report::isValidDate($date_end) && $date_start <= $date_end;
 $has_valid_entity = $entities_id === 0 || ($entities_id > 0 && Session::haveAccessToEntity($entities_id));
@@ -107,16 +104,11 @@ if (!$has_valid_dates) {
 } elseif (!$has_valid_entity) {
     echo "<div class='alert alert-warning'>" . __s('Selecione uma entidade válida.', 'relatorioglpicomercial') . "</div>";
 } else {
-    $rows = DashboardReport::getRows([
-        'entities_id'       => $entities_id,
-        'date_start'        => $date_start,
-        'date_end'          => $date_end,
-        'itilcategories_id' => $itilcategories_id,
-        'status'            => $status,
-        'users_id_tech'     => $users_id_tech,
-    ]);
+    $rows = DashboardReport::getRows($filters);
 
-    echo DashboardRenderer::render($rows, $date_start, $date_end);
+    $pdf_url = 'dashboard_pdf.php?' . http_build_query($filters);
+
+    echo DashboardRenderer::render($rows, $date_start, $date_end, $pdf_url);
 }
 
 Html::footer();

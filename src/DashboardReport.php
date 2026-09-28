@@ -50,6 +50,28 @@ class DashboardReport
     private const FIELDS_TABLE  = 'glpi_plugin_fields_ticketprevisodehoras';
     private const FIELDS_COLUMN = 'horasprevistasfieldtwo';
 
+    /**
+     * Normalizes the filters of the dashboard page and of its PDF export, so
+     * both read the query string the same way (the period defaults to the
+     * current month).
+     *
+     * @param array<string, mixed> $input usually $_GET
+     * @return array{entities_id: int, itilcategories_id: int, users_id_tech: int, status: string, date_start: string, date_end: string}
+     */
+    public static function filtersFromRequest(array $input): array
+    {
+        $status = (string) ($input['status'] ?? '');
+
+        return [
+            'entities_id'       => (int) ($input['entities_id'] ?? 0),
+            'itilcategories_id' => (int) ($input['itilcategories_id'] ?? 0),
+            'users_id_tech'     => (int) ($input['users_id_tech'] ?? 0),
+            'status'            => isset(self::STATUS_GROUPS[$status]) ? $status : '',
+            'date_start'        => (string) ($input['date_start'] ?? date('Y-m-01')),
+            'date_end'          => (string) ($input['date_end'] ?? date('Y-m-d')),
+        ];
+    }
+
     public static function typeLabel(int $type): string
     {
         return match ($type) {

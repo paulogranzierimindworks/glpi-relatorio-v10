@@ -1,0 +1,79 @@
+{#
+ # PDF-only markup. See report_client.html.twig for why it stays this flat.
+ # The ticket columns are the ones the user picked on screen (columns, with
+ # width in % and alignment already computed by ReportPdf).
+ #}
+<table width="100%" cellpadding="2" cellspacing="0">
+  <tr>
+    <td width="100%" style="border-bottom:0.6pt solid #cbd5e1;color:#5b6674;font-size:7.5pt;"><b>HORAS POR CATEGORIA</b></td>
+  </tr>
+</table>
+
+<table width="40%" cellpadding="3" cellspacing="0" style="font-size:8pt;">
+  <thead>
+    <tr style="background-color:#1a3a5c;color:#ffffff;">
+      <th width="70%" align="left">Categoria</th>
+      <th width="30%" align="center">Total Horas</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for categoria in categorias %}
+    <tr style="background-color:{{ loop.index is odd ? '#ffffff' : '#f7f8fa' }};">
+      <td width="70%" align="left">{{ categoria.categoria }}</td>
+      <td width="30%" align="center">{{ categoria.tempo_fmt }}</td>
+    </tr>
+    {% else %}
+    <tr>
+      <td width="100%" colspan="2" align="center" style="color:#94a3b8;">Nenhuma hora apontada no período.</td>
+    </tr>
+    {% endfor %}
+    <tr style="background-color:#1a3a5c;color:#ffffff;">
+      <td width="70%" align="left"><b>Total</b></td>
+      <td width="30%" align="center"><b>{{ total_periodo_fmt }}</b></td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+<table width="100%" cellpadding="2" cellspacing="0">
+  <tr>
+    <td width="100%" style="border-bottom:0.6pt solid #cbd5e1;color:#5b6674;font-size:7.5pt;"><b>CHAMADOS</b></td>
+  </tr>
+</table>
+
+{% set first_key = (columns|first).key %}
+<table width="100%" cellpadding="3" cellspacing="0" style="font-size:{{ font_size }}pt;">
+  <thead>
+    <tr style="background-color:#1a3a5c;color:#ffffff;">
+      {% for col in columns %}
+      <th width="{{ col.width }}" align="{{ col.align }}"><b>{{ col.label }}</b></th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <tr style="background-color:{{ loop.index is odd ? '#ffffff' : '#f7f8fa' }};">
+      {% for col in columns %}
+      {% set value = row[col.field] %}
+      {% if col.key in ['sla', 'sla_atendimento'] and value == 'Violado' %}
+      <td width="{{ col.width }}" align="{{ col.align }}" style="color:#c0392b;"><b>{{ value }}</b></td>
+      {% elseif col.key in ['sla', 'sla_atendimento'] and value == 'No prazo' %}
+      <td width="{{ col.width }}" align="{{ col.align }}" style="color:#0f6e56;"><b>{{ value }}</b></td>
+      {% else %}
+      <td width="{{ col.width }}" align="{{ col.align }}">{{ value }}</td>
+      {% endif %}
+      {% endfor %}
+    </tr>
+    {% else %}
+    <tr>
+      <td width="100%" colspan="{{ columns|length }}" align="center" style="color:#94a3b8;">Nenhum chamado encontrado para os filtros informados.</td>
+    </tr>
+    {% endfor %}
+
+    <tr style="background-color:#1a3a5c;color:#ffffff;">
+      {% for col in columns %}
+      <td width="{{ col.width }}" align="{{ col.key == first_key ? 'left' : 'center' }}"><b>{% if col.key == 'periodo' %}{{ total_periodo_fmt }}{% elseif col.key == first_key %}Total{% endif %}</b></td>
+      {% endfor %}
+    </tr>
+  </tbody>
+</table>
