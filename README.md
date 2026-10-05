@@ -135,8 +135,10 @@ do plugin.
 ### Configuração global
 
 | Opção               | Descrição                                                                                     |
-| ------------------- | --------------------------------------------------------------------------------------------- |
-| Ativo               | Liga/desliga o envio automático.                                                              |
+| ------------------- | ---------------------------------------------------------------------------------------------- |
+| Nome / Ativo        | Identifica o grupo e liga/desliga o seu envio automático.                                     |
+| Tipo de relatório   | **Relatório Comercial** (horas por cliente) ou **Dashboard de Chamados**. Um único tipo por grupo. |
+| Anexos              | **Anexar PDF**. O corpo do e-mail é sempre o modelo de texto abaixo; o PDF vai como anexo do relatório daquela entidade no período. |
 | Periodicidade       | Diária, semanal (dia da semana) ou mensal (dia do mês, 1-31).                                 |
 | Hora de envio       | Hora do dia (0-23) a partir da qual o envio pode ocorrer.                                     |
 | Janela de dados     | **Mês vigente**, **Mês anterior** ou **Últimos N dias** (1-365).                              |
