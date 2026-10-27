@@ -12,9 +12,9 @@
 namespace GlpiPlugin\Relatorioglpicomercial\Tests;
 
 use DateTimeImmutable;
-use GlpiPlugin\Relatorioglpicomercial\MailConfig;
 use GlpiPlugin\Relatorioglpicomercial\ReportMailer;
 use GlpiPlugin\Relatorioglpicomercial\ReportScheduler;
+use GlpiPlugin\Relatorioglpicomercial\TransmissionGroup;
 use PHPUnit\Framework\TestCase;
 
 class ReportSchedulerTest extends TestCase
@@ -25,7 +25,7 @@ class ReportSchedulerTest extends TestCase
      */
     private function config(array $overrides = []): array
     {
-        return $overrides + MailConfig::getDefaults();
+        return $overrides + TransmissionGroup::getDefaults();
     }
 
     public function testDailyFiresOnceTheHourIsReached(): void
@@ -181,9 +181,12 @@ class ReportSchedulerTest extends TestCase
         $this->assertStringContainsString('&lt;script&gt;', $html);
     }
 
-    public function testValidateClampsAndFallsBackToDefaults(): void
+    public function testPrepareInputForUpdateClampsAndFallsBackToDefaults(): void
     {
-        $validated = MailConfig::validate([
+        $group = new TransmissionGroup();
+
+        $validated = $group->prepareInputForUpdate([
+            'name'        => 'Grupo Teste',
             'frequency'   => 'hourly',
             'send_hour'   => 99,
             'send_day'    => 0,
@@ -191,11 +194,39 @@ class ReportSchedulerTest extends TestCase
             'window_days' => 5000,
         ]);
 
-        $this->assertSame(MailConfig::getDefaults()['frequency'], $validated['frequency']);
-        $this->assertSame(MailConfig::getDefaults()['window_type'], $validated['window_type']);
+        $this->assertIsArray($validated);
+        $this->assertSame(TransmissionGroup::getDefaults()['frequency'], $validated['frequency']);
+        $this->assertSame(TransmissionGroup::getDefaults()['window_type'], $validated['window_type']);
         $this->assertSame(23, $validated['send_hour']);
         $this->assertSame(1, $validated['send_day']);
         $this->assertSame(365, $validated['window_days']);
-        $this->assertSame(0, $validated['is_active']);
+    }
+
+    public function testPrepareInputForUpdateRejectsBlankName(): void
+    {
+        $group = new TransmissionGroup();
+
+        $this->assertFalse($group->prepareInputForUpdate(['name' => '   ']));
+    }
+
+    public function testSchedulingIsAgnosticToTheGroupsReportType(): void
+    {
+        $config = $this->config([
+            'report_type' => TransmissionGroup::REPORT_DASHBOARD,
+            'frequency'   => ReportScheduler::FREQ_DAILY,
+            'send_hour'   => 8,
+        ]);
+
+        $this->assertSame(
+            '2026-09-17',
+            ReportScheduler::periodKey($config, new DateTimeImmutable('2026-09-17 08:00:00'))
+        );
+        $this->assertSame(
+            ['2026-09-01', '2026-09-17'],
+            ReportScheduler::resolveWindow(
+                $config + ['window_type' => ReportScheduler::WINDOW_CURRENT_MONTH],
+                new DateTimeImmutable('2026-09-17 08:00:00')
+            )
+        );
     }
 }

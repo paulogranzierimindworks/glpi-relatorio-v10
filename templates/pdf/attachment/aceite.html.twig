@@ -1,0 +1,9 @@
+{#
+ # Attachment, "Formalização e Aceite": the acceptance text. The signature
+ # blocks follow in assinaturas.html.twig, after some room to sign.
+ #}
+<div style="font-size:8.6pt;color:#334155;line-height:1.6;text-align:justify;">
+  {% for paragraph in paragraphs %}
+  <p>{{ paragraph|nl2br }}</p>
+  {% endfor %}
+</div>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Relatório de Horas</title>
+</head>
+
+<body style="margin:0; padding:0; background-color:#f4f6f8; font-family: Arial, sans-serif;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f8; padding:20px 0;">
+    <tr>
+      <td align="center">
+
+        <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.1);">
+
+          <tr>
+            <td style="background:#1a3a5c; padding:20px; text-align:center; color:#ffffff;">
+              <h2 style="margin:0;">Relatório de Horas</h2>
+              <p style="margin:5px 0 0 0; font-size:14px; opacity:0.9;">
+                Monitoramento de utilização contratada
+              </p>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:30px; color:#333;">
+
+              <p style="font-size:16px;">Olá,</p>
+
+              <p style="font-size:15px; line-height:1.5;">
+                Segue o resumo de utilização de horas do período
+                <strong>{{ periodo }}</strong>:
+              </p>
+
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:20px; border:1px solid #e0e0e0; border-radius:6px;">
+
+                <tr style="background:#f0f4ff;">
+                  <td style="padding:12px; font-weight:bold;">Cliente</td>
+                  <td style="padding:12px;">{{ cliente }}</td>
+                </tr>
+
+                <tr>
+                  <td style="padding:12px; font-weight:bold;">Horas Contratadas</td>
+                  <td style="padding:12px;">{{ horas_contratadas }}</td>
+                </tr>
+
+                <tr style="background:#f9fafc;">
+                  <td style="padding:12px; font-weight:bold;">Horas Trabalhadas</td>
+                  <td style="padding:12px;">{{ horas_trabalhadas }}</td>
+                </tr>
+
+                <tr>
+                  <td style="padding:12px; font-weight:bold;">Utilização</td>
+                  <td style="padding:12px; font-weight:bold; color:{{ percentual_cor }};">
+                    {{ percentual }}%
+                  </td>
+                </tr>
+
+              </table>
+
+              <div style="margin-top:25px; padding:15px; background:#f0f4ff; border-left:4px solid #1a3a5c; border-radius:4px;">
+                <p style="margin:0; font-size:14px;">
+                  Este percentual representa o quanto das horas contratadas já foram
+                  utilizadas no período de {{ data_inicio }} a {{ data_fim }}.
+                </p>
+              </div>
+
+              <p style="margin-top:25px; font-size:14px;">
+                Caso tenha dúvidas ou precise de mais detalhes, estamos à disposição.
+              </p>
+
+            </td>
+          </tr>
+
+          <tr>
+            <td style="background:#f4f6f8; padding:15px; text-align:center; font-size:12px; color:#777;">
+              Gerado automaticamente em {{ gerado_em }}<br>
+              Email automático - não responder
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

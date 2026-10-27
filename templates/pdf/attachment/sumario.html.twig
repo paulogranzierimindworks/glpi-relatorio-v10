@@ -1,0 +1,40 @@
+{#
+ # Attachment, "Sumário" + "1. Visão Geral", side by side. Page numbers are
+ # internal links ("#N" is a page in TCPDF).
+ #}
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr>
+    <td width="46%">
+      <table width="100%" cellpadding="3" cellspacing="0">
+        <tr><td width="100%" colspan="2" style="font-size:13.5pt;color:#005295;"><b>{{ toc_title }}</b></td></tr>
+        <tr><td width="100%" colspan="2" style="font-size:4pt;">&nbsp;</td></tr>
+        {% for entry in entries %}
+        <tr>
+          {% if entry.sub %}
+          <td width="88%" style="font-size:8.6pt;color:#334155;">&nbsp;&nbsp;&nbsp;&nbsp;<a href="#{{ entry.page }}" style="color:#334155;text-decoration:none;">{{ entry.title }}</a></td>
+          <td width="12%" align="right" style="font-size:8.6pt;"><a href="#{{ entry.page }}" style="color:#005295;text-decoration:none;">{{ entry.page }}</a></td>
+          {% else %}
+          <td width="88%" style="font-size:8.6pt;color:#1e293b;"><b><a href="#{{ entry.page }}" style="color:#1e293b;text-decoration:none;">{{ entry.title }}</a></b></td>
+          <td width="12%" align="right" style="font-size:8.6pt;"><b><a href="#{{ entry.page }}" style="color:#005295;text-decoration:none;">{{ entry.page }}</a></b></td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </table>
+    </td>
+    <td width="4%" style="border-right:0.4pt solid #e5e7eb;">&nbsp;</td>
+    <td width="4%">&nbsp;</td>
+    <td width="46%">
+      <table width="100%" cellpadding="3" cellspacing="0">
+        <tr><td width="100%" style="font-size:12pt;color:#005295;"><b>{{ title }}</b></td></tr>
+        <tr><td width="100%" style="font-size:4pt;">&nbsp;</td></tr>
+        <tr>
+          <td width="100%" style="font-size:8.6pt;color:#334155;line-height:1.6;text-align:justify;">
+            {% for paragraph in paragraphs %}
+            <p>{{ paragraph|nl2br }}</p>
+            {% endfor %}
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>

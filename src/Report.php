@@ -225,6 +225,56 @@ class Report
     }
 
     /**
+     * All entities outside the "INATIVOS" branch, regardless of contract —
+     * unlike getEntitiesWithContract(), the ticket dashboard has no concept of
+     * contracted hours.
+     *
+     * @return array<int, array{entities_id: int, nome: string}>
+     */
+    public static function getAllSelectableEntities(): array
+    {
+        global $DB;
+
+        $result = [];
+        foreach (
+            $DB->request([
+                'SELECT' => ['id', 'completename'],
+                'FROM'   => 'glpi_entities',
+                'WHERE'  => ['completename' => ['NOT LIKE', '%INATIVOS%']],
+            ]) as $entity
+        ) {
+            $segments = explode('>', $entity['completename']);
+            $result[] = [
+                'entities_id' => (int) $entity['id'],
+                'nome'        => trim(end($segments)),
+            ];
+        }
+
+        usort($result, static fn (array $a, array $b): int => $a['entities_id'] <=> $b['entities_id']);
+
+        return $result;
+    }
+
+    /**
+     * The entities selectable for a given report type: entities with a
+     * contract for the commercial report (same list it has always used), all
+     * non-inactive entities for the ticket dashboard.
+     *
+     * @return array<int, array{entities_id: int, nome: string}>
+     */
+    public static function getSelectableEntities(string $report_type): array
+    {
+        if ($report_type === TransmissionGroup::REPORT_DASHBOARD) {
+            return self::getAllSelectableEntities();
+        }
+
+        return array_map(
+            static fn (array $entity): array => ['entities_id' => $entity['entities_id'], 'nome' => $entity['nome']],
+            self::getEntitiesWithContract()
+        );
+    }
+
+    /**
      * Entities with an active contract, contracted vs. worked hours in the
      * given period, and the resulting percentage.
      *

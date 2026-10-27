@@ -33,6 +33,10 @@ if ($filters['entities_id'] < 0 || ($filters['entities_id'] > 0 && !Session::hav
 }
 
 $rows    = DashboardReport::getRows($filters);
-$visible = DashboardColumns::getVisibleKeys((int) Session::getLoginUserID());
+// The columns checked on screen travel in the URL; the saved preference is only
+// the fallback for links without them.
+$visible = isset($_GET['columns']) && is_array($_GET['columns'])
+    ? DashboardColumns::sanitize($_GET['columns'])
+    : DashboardColumns::getVisibleKeys((int) Session::getLoginUserID());
 
 ReportPdf::streamDashboardReport($rows, $filters['date_start'], $filters['date_end'], $visible);

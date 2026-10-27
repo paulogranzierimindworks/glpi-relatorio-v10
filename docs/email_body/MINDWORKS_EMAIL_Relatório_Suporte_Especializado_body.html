@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Relatório de Suporte Especializado - {{ cliente }}</title>
+</head>
+<body style="margin:0; padding:0; background-color:#e2e8f0; font-family:Arial, Helvetica, sans-serif; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
+
+  <!-- Wrapper Geral do E-mail (100% Largura) -->
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#e2e8f0" style="background-color:#e2e8f0; width:100%; margin:0; padding:30px 10px;">
+    <tr>
+      <td align="center" valign="top">
+
+        <!-- Container Principal (600px - Padrão Universal para E-mail Marketing) -->
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="max-width:600px; width:100%; background-color:#ffffff; border-radius:6px; overflow:hidden; box-shadow:0 4px 12px rgba(0, 14, 39, 0.10); border-collapse:collapse;">
+
+          <!-- ==========================================================================
+               1. TOPO (HEADER) - INSPIRADO NA CAPA DO RELATÓRIO (#000e27 + #6be3f7)
+               ========================================================================== -->
+          <tr>
+            <td bgcolor="#000e27" style="background-color:#000e27; padding:40px 40px 35px 40px; text-align:left;">
+              
+              <!-- Subtítulo Neon Ciano -->
+              <div style="font-family:Arial, Helvetica, sans-serif; font-size:12px; font-weight:bold; color:#6be3f7; letter-spacing:2px; text-transform:uppercase; margin-bottom:8px;">
+                RELATÓRIO
+              </div>
+
+              <!-- Título Secundário Branco -->
+              <div style="font-family:Arial, Helvetica, sans-serif; font-size:20px; font-weight:normal; color:#ffffff; letter-spacing:1px; text-transform:uppercase; margin-bottom:6px;">
+                SUPORTE ESPECIALIZADO
+              </div>
+
+              <!-- Nome do Cliente e Período em Destaque -->
+              <div style="font-family:Arial, Helvetica, sans-serif; font-size:24px; font-weight:bold; color:#ffffff; line-height:1.3; margin-bottom:0;">
+                {{ cliente }} &ndash; {{ periodo }}
+              </div>
+
+            </td>
+          </tr>
+
+          <!-- Linha Neon Ciano (#6be3f7) que vai até o final da largura da borda esquerda (sem a bolinha na esquerda) -->
+          <tr>
+            <td bgcolor="#000e27" style="background-color:#000e27; padding:18px 40px 35px 0;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td width="100%" valign="middle" style="padding:0; margin:0;">
+                    <div style="height:2px; background-color:#6be3f7; font-size:1px; line-height:2px;">&nbsp;</div>
+                  </td>
+                  <td width="8" valign="middle" style="padding:0; margin:0;">
+                    <div style="width:8px; height:8px; background-color:#6be3f7; border-radius:50%; font-size:1px; line-height:1px;">&nbsp;</div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ==========================================================================
+               2. ESPAÇO PARA CONTEÚDO (CORPO DO E-MAIL)
+               ========================================================================== -->
+          <tr>
+            <td bgcolor="#ffffff" style="background-color:#ffffff; padding:36px 40px 32px 40px; text-align:left; color:#334155; font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:1.6;">
+
+              <!-- Saudação Inicial -->
+              <p style="margin:0 0 16px 0; font-size:16px; font-weight:bold; color:#000e27;">
+                Olá,
+              </p>
+
+              <!-- Texto de Abertura -->
+              <p style="margin:0 0 20px 0; color:#334155;">
+                Encaminhamos para sua análise e acompanhamento o <strong>Relatório Mensal de Suporte Especializado,</strong> referente às demandas, chamados e eventos técnicos atendidos para <strong>{{ cliente }}</strong> durante o período de <strong>{{ periodo }}</strong>.
+              </p>
+
+              <!-- Tabela de Identificação do Relatório (Mesmo padrão corporativo da Página 3 do PDF) -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="background-color:#ffffff; border:1px solid #005096; border-collapse:collapse; margin-bottom:24px; font-size:12px;">
+                <tr>
+                  <td width="38%" style="font-weight:bold; color:#005096; padding:10px 14px; border-bottom:1px solid #cbd5e1; border-right:1px solid #cbd5e1; text-transform:uppercase;">
+                    CLIENTE
+                  </td>
+                  <td width="62%" style="color:#1e293b; padding:10px 14px; border-bottom:1px solid #cbd5e1;">
+                    {{ cliente }}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-weight:bold; color:#005096; padding:10px 14px; border-bottom:1px solid #cbd5e1; border-right:1px solid #cbd5e1; text-transform:uppercase;">
+                    PERÍODO DE REFERÊNCIA
+                  </td>
+                  <td style="color:#1e293b; padding:10px 14px; border-bottom:1px solid #cbd5e1;">
+                    {{ periodo }}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-weight:bold; color:#005096; padding:10px 14px; border-bottom:1px solid #cbd5e1; border-right:1px solid #cbd5e1; text-transform:uppercase;">
+                    HORAS CONTRATADAS
+                  </td>
+                  <td style="color:#1e293b; padding:10px 14px; border-bottom:1px solid #cbd5e1;">
+                    {{ horas_contratadas }}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-weight:bold; color:#005096; padding:10px 14px; border-bottom:1px solid #cbd5e1; border-right:1px solid #cbd5e1; text-transform:uppercase;">
+                    HORAS TRABALHADAS
+                  </td>
+                  <td style="color:#1e293b; padding:10px 14px; border-bottom:1px solid #cbd5e1;">
+                    {{ horas_trabalhadas }}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-weight:bold; color:#005096; padding:10px 14px; border-bottom:1px solid #cbd5e1; border-right:1px solid #cbd5e1; text-transform:uppercase;">
+                    UTILIZAÇÃO
+                  </td>
+                  <td style="color:#1e293b; padding:10px 14px; border-bottom:1px solid #cbd5e1;">
+                    <strong style="color:{{ percentual_cor }};" >{{ percentual }}%</strong>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-weight:bold; color:#005096; padding:10px 14px; border-right:1px solid #cbd5e1; text-transform:uppercase;">
+                    GERADO EM
+                  </td>
+                  <td style="color:#1e293b; padding:10px 14px;">
+                    {{ gerado_em }}
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:0 0 24px 0; color:#334155;">
+                O documento completo com o detalhamento dos indicadores, gráficos de atendimento e chamados do período encontra-se em anexo.
+              </p>
+
+              <!-- Assinatura / Fechamento -->
+              <p style="margin:24px 0 0 0; font-size:13px; color:#64748b; border-top:1px solid #e5e7eb; padding-top:16px;">
+                Em caso de dúvidas ou necessidade de esclarecimentos adicionais sobre os indicadores apresentados, nossa equipe permanece à disposição.<br><br>
+                Atenciosamente,<br>
+                <strong style="color:#005295;">Equipe de Suporte Especializado &bull; Mindworks</strong>
+              </p>
+
+            </td>
+          </tr>
+
+          <!-- ==========================================================================
+               3. RODAPÉ (FOOTER) - AZUL MINDWORKS (#005295) IGUAL À CAPA DO RELATÓRIO
+               ========================================================================== -->
+          <tr>
+            <td bgcolor="#005295" align="center" style="background-color:#005295; padding:26px 40px;">
+              
+              <!-- Logo Mindworks Branca em SVG Vetorial Oficial (Com Fallback em Texto Estilizado para clientes que bloqueiam SVG) -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="190" height="26" viewBox="0 0 204.721 28.571" role="img" aria-label="Mindworks" style="display:block; margin:0 auto;">
+                <g transform="translate(-11.905 -10.714)" fill="#ffffff">
+                  <path d="M105.219,17.892h-1.6V32.108h1.6Z"></path>
+                  <path d="M119.588,17.892h1.574V32.108h-1.279L110.7,20.451V32.108h-1.561V17.892h1.5l8.956,11.4Z"></path>
+                  <path d="M129.978,19.377h-3.327v11.26h3.327a5.633,5.633,0,1,0,0-11.247Zm0,12.808h-4.939V17.892h4.939c4.465,0,7.562,3.071,7.562,7.089a7.127,7.127,0,0,1-7.562,7.127"></path>
+                  <path d="M148.4,17.854h1.318l3.9,11.887,4.069-11.848h1.676l-5.08,14.318h-1.356l-3.9-11.528L145.114,32.21h-1.343l-5.08-14.318h1.753L144.5,29.74Z"></path>
+                  <path d="M91.183,32.21H89.865l-3.9-11.887L81.894,32.172H80.218L85.3,17.854h1.356l3.9,11.541,3.915-11.541h1.344l5.08,14.318H99.142L95.086,20.323Z"></path>
+                  <path d="M167.864,19.133a5.593,5.593,0,0,0-5.566,5.847,5.656,5.656,0,0,0,5.6,5.886,5.59,5.59,0,0,0,5.566-5.847,5.655,5.655,0,0,0-5.6-5.886Zm0,13.217a7.139,7.139,0,0,1-7.229-7.332,7.255,7.255,0,1,1,14.5,0,7.2,7.2,0,0,1-7.268,7.37"></path>
+                  <path d="M184.293,19.377H179.9v5.771h4.363c2.137,0,3.66-1.1,3.66-2.943S186.647,19.377,184.293,19.377Zm3.838,12.8-4.12-5.527H179.9v5.527h-1.663V17.892h6.116c3.122,0,5.118,1.689,5.118,4.248a4.171,4.171,0,0,1-3.839,4.158L190,32.108Z"></path>
+                  <path d="M204.855,32.108h-2.009l-5.464-6.884-3.032,3.071v3.813h-1.6V17.892h1.6v8.5l8.176-8.5H204.6l-6.1,6.218Z"></path>
+                  <path d="M211.994,24.226c3.174.691,4.632,1.843,4.632,4.043,0,2.457-2.034,4.043-4.849,4.043a8.33,8.33,0,0,1-5.809-2.278l1-1.177a6.77,6.77,0,0,0,4.875,2.009c1.906,0,3.173-1,3.173-2.431s-.717-2.1-3.7-2.725c-3.275-.716-4.772-1.766-4.772-4.12s1.97-3.839,4.67-3.839a7.422,7.422,0,0,1,5,1.753l-.934,1.279a6.246,6.246,0,0,0-4.108-1.548c-1.842,0-3.032,1.011-3.032,2.316s.729,2.111,3.839,2.777"></path>
+                  <path d="M70.89,10.714l-7.818,20.28-7.831-20.28h-8.33l-7.818,20.28-7.83-20.28h-8.33L11.9,39.286h7.37l7.831-20.268,7.818,20.268h8.33L51.07,19.018,58.9,39.286h8.33L78.26,10.714Z"></path>
+                </g>
+              </svg>
+
+            </td>
+          </tr>
+
+          <!-- Sub-rodapé Legal / Confidencialidade -->
+          <tr>
+            <td bgcolor="#000e27" align="center" style="background-color:#000e27; padding:16px 30px; font-family:Arial, Helvetica, sans-serif; font-size:11px; color:#94a3b8; line-height:1.5;">
+              &copy; Mindworks Informática Ltda. Todos os direitos reservados.<br>
+              As informações contidas neste e-mail e em seus anexos são confidenciais e privilegiadas para uso exclusivo de {{ cliente }}.
+            </td>
+          </tr>
+
+        </table>
+        <!-- Fim Container 600px -->
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

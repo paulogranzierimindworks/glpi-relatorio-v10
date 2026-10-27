@@ -1,0 +1,14 @@
+{# Attachment, "Formalização e Aceite": both signature blocks side by side. #}
+<table width="100%" cellpadding="2" cellspacing="0">
+  <tr>
+    {% for signer in signers %}
+    <td width="42%" align="center" style="border-top:1.1pt solid #000e27;">
+      <span style="font-size:9pt;color:#000e27;"><b>{{ signer.name ?: ' ' }}</b></span><br>
+      <span style="font-size:8.2pt;color:#005295;">{{ signer.role ?: ' ' }}</span><br>
+      <span style="font-size:7.5pt;color:#64748b;">{{ signer.company }}</span><br><br>
+      <span style="font-size:7.5pt;color:#94a3b8;">Data: ____/____/{{ ano }}</span>
+    </td>
+    {% if not loop.last %}<td width="16%">&nbsp;</td>{% endif %}
+    {% endfor %}
+  </tr>
+</table>

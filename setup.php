@@ -32,7 +32,7 @@
  */
 
 /** @phpstan-ignore theCodingMachineSafe.function (safe to assume this isn't already defined) */
-define('PLUGIN_RELATORIOGLPICOMERCIAL_VERSION', '1.1.0');
+define('PLUGIN_RELATORIOGLPICOMERCIAL_VERSION', '1.3.0');
 
 // Minimal GLPI version, inclusive
 /** @phpstan-ignore theCodingMachineSafe.function (safe to assume this isn't already defined) */
@@ -72,7 +72,7 @@ function plugin_init_relatorioglpicomercial(): void
     ];
 
     // Wrench icon next to the plugin in Setup > Plugins.
-    $PLUGIN_HOOKS['config_page']['relatorioglpicomercial'] = 'front/config.form.php';
+    $PLUGIN_HOOKS['config_page']['relatorioglpicomercial'] = 'front/transmissiongroup.php';
 
     // Adds a tab on the core Profile form so admins can grant/revoke the
     // plugin's READ right per profile.

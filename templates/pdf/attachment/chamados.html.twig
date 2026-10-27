@@ -1,0 +1,42 @@
+{#
+ # Attachment, "Relatório de Chamados": the dashboard's ticket table in the
+ # template's colors, with the columns picked on the group (widths and
+ # alignment computed by ReportPdf::pdfColumns()).
+ #}
+{% set first_key = (columns|first).key %}
+<table width="100%" cellpadding="2" cellspacing="0" style="font-size:{{ font_size }}pt;">
+  <thead>
+    <tr style="background-color:#005096;color:#ffffff;">
+      {% for col in columns %}
+      <th width="{{ col.width }}" align="{{ col.align }}" style="font-size:{{ header_font_size }}pt;{{ not loop.last ? 'border-right:0.4pt solid #ffffff;' }}"><b>{{ col.label|upper }}</b></th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <tr style="background-color:{{ loop.index is odd ? '#ffffff' : '#f9fafb' }};">
+      {% for col in columns %}
+      {% set value = row[col.field] %}
+      {% if col.key in ['sla', 'sla_atendimento'] and value == 'Violado' %}
+      <td width="{{ col.width }}" align="{{ col.align }}" style="border-bottom:0.3pt solid #e2e8f0;color:#c0392b;"><b>{{ value }}</b></td>
+      {% elseif col.key in ['sla', 'sla_atendimento'] and value == 'No prazo' %}
+      <td width="{{ col.width }}" align="{{ col.align }}" style="border-bottom:0.3pt solid #e2e8f0;color:#15803d;"><b>{{ value }}</b></td>
+      {% elseif col.key == 'id' %}
+      <td width="{{ col.width }}" align="{{ col.align }}" style="border-bottom:0.3pt solid #e2e8f0;color:#005096;"><b>{{ value }}</b></td>
+      {% else %}
+      <td width="{{ col.width }}" align="{{ col.align }}" style="border-bottom:0.3pt solid #e2e8f0;color:#1e293b;">{{ value }}</td>
+      {% endif %}
+      {% endfor %}
+    </tr>
+    {% else %}
+    <tr>
+      <td width="100%" colspan="{{ columns|length }}" align="center" style="color:#94a3b8;">Nenhum chamado no período de referência.</td>
+    </tr>
+    {% endfor %}
+    <tr style="background-color:#000e27;color:#ffffff;">
+      {% for col in columns %}
+      <td width="{{ col.width }}" align="{{ col.key == first_key ? 'left' : 'center' }}"><b>{% if col.key == 'periodo' %}{{ total_periodo_fmt }}{% elseif col.key == first_key %}Total{% endif %}</b></td>
+      {% endfor %}
+    </tr>
+  </tbody>
+</table>

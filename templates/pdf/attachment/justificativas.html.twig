@@ -1,0 +1,52 @@
+{#
+ # Attachment, "Justificativas": the indicators panel, the configured
+ # justification text and the tickets whose SLA was violated.
+ #}
+{% include '@relatorioglpicomercial/pdf/attachment/_painel.html.twig' %}
+<br>
+<table width="100%" cellpadding="5" cellspacing="0" style="font-size:8pt;">
+  <tr>
+    <td width="100%" align="center" style="background-color:#000e27;color:#ffffff;font-size:8.5pt;"><b>JUSTIFICATIVAS</b></td>
+  </tr>
+  <tr>
+    <td width="100%" style="border-left:0.9pt solid #005096;border-right:0.9pt solid #005096;border-bottom:0.9pt solid #005096;color:#334155;line-height:1.5;">
+      {% for paragraph in paragraphs %}
+      <p>{{ paragraph|nl2br }}</p>
+      {% endfor %}
+      {% if paragraphs is empty and violated is empty %}
+      <i style="color:#64748b;">{{ empty_text }}</i>
+      {% elseif paragraphs is empty %}
+      <i style="color:#64748b;">Chamados com SLA violado no período de referência:</i>
+      {% endif %}
+    </td>
+  </tr>
+</table>
+{% if violated is not empty %}
+<table width="100%" cellpadding="3" cellspacing="0" style="font-size:7.2pt;">
+  <thead>
+    <tr style="background-color:#005096;color:#ffffff;">
+      <th width="7%" align="center"><b>ID</b></th>
+      <th width="33%" align="left"><b>TÍTULO CHAMADO</b></th>
+      <th width="16%" align="left"><b>CATEGORIA</b></th>
+      <th width="16%" align="left"><b>ANALISTA</b></th>
+      <th width="12%" align="center"><b>ABERTURA</b></th>
+      <th width="8%" align="center"><b>SLA ATEND.</b></th>
+      <th width="8%" align="center"><b>SLA SOLUÇÃO</b></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in violated %}
+    <tr style="background-color:{{ loop.index is odd ? '#ffffff' : '#f9fafb' }};">
+      <td width="7%" align="center" style="border-bottom:0.3pt solid #e2e8f0;color:#005096;"><b>{{ row.id }}</b></td>
+      <td width="33%" align="left" style="border-bottom:0.3pt solid #e2e8f0;">{{ row.titulo }}</td>
+      <td width="16%" align="left" style="border-bottom:0.3pt solid #e2e8f0;">{{ row.categoria }}</td>
+      <td width="16%" align="left" style="border-bottom:0.3pt solid #e2e8f0;">{{ row.analistas|join(', ') }}</td>
+      <td width="12%" align="center" style="border-bottom:0.3pt solid #e2e8f0;">{{ row.abertura_fmt }}</td>
+      {% for value in [row.sla_atendimento, row.sla] %}
+      <td width="8%" align="center" style="border-bottom:0.3pt solid #e2e8f0;color:{{ value == 'Violado' ? '#c0392b' : (value == 'No prazo' ? '#15803d' : '#1e293b') }};"><b>{{ value }}</b></td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}

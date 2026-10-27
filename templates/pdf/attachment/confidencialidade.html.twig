@@ -1,0 +1,11 @@
+{#
+ # Attachment, "Aviso de confidencialidade". Rendered by TCPDF: keep the markup
+ # flat (see ../report_client.html.twig). Paragraphs arrive already escaped,
+ # with the parties' names highlighted.
+ #}
+<div style="font-size:8.6pt;color:#334155;line-height:1.6;text-align:justify;">
+  {% for paragraph in paragraphs %}
+  <p><i>{{ paragraph|raw }}</i></p>
+  {% endfor %}
+  <p style="font-size:7.9pt;color:#1e293b;"><b>&copy; {{ ano }} Mindworks Informática Ltda</b></p>
+</div>

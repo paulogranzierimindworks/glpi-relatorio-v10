@@ -67,6 +67,17 @@ class ReportPdf
         string $date_start,
         string $date_end
     ): void {
+        $pdf = self::buildClientReport($entity, $tickets, $categories, $date_start, $date_end);
+        $pdf->Output('relatorio-cliente-' . $entity['id'] . '.pdf', 'D');
+    }
+
+    private static function buildClientReport(
+        array $entity,
+        array $tickets,
+        array $categories,
+        string $date_start,
+        string $date_end
+    ): ReportPdfDocument {
         $data = ReportRenderer::prepareClientData($entity, $tickets, $categories, $date_start, $date_end);
 
         $heading = (string) ($entity['name'] ?? '');
@@ -88,7 +99,7 @@ class ReportPdf
             TemplateRenderer::getInstance()->render('@relatorioglpicomercial/pdf/report_client.html.twig', $data)
         );
 
-        $pdf->Output('relatorio-cliente-' . $entity['id'] . '.pdf', 'D');
+        return $pdf;
     }
 
     public static function streamGeneralReport(array $rows, string $date_start, string $date_end): void
@@ -125,6 +136,16 @@ class ReportPdf
      */
     public static function streamDashboardReport(array $rows, string $date_start, string $date_end, array $visible): void
     {
+        $pdf = self::buildDashboardReport($rows, $date_start, $date_end, $visible);
+        $pdf->Output('dashboard-chamados.pdf', 'D');
+    }
+
+    /**
+     * @param list<array<string, mixed>> $rows    rows from DashboardReport::getRows()
+     * @param list<string>               $visible column keys, see DashboardColumns
+     */
+    private static function buildDashboardReport(array $rows, string $date_start, string $date_end, array $visible): ReportPdfDocument
+    {
         $data = DashboardRenderer::prepareData($rows, $date_start, $date_end);
 
         $pdf = new ReportPdfDocument(
@@ -135,16 +156,7 @@ class ReportPdf
             'L'
         );
 
-        $kpis = $data['kpis'];
-        $pdf->drawSummaryCards([
-            ['label' => 'Total', 'value' => (string) $kpis['total']],
-            ['label' => 'Em atendimento', 'value' => (string) $kpis['em_atendimento'], 'color' => self::COLOR_INFO],
-            ['label' => 'Pendente', 'value' => (string) $kpis['pendente'], 'color' => self::COLOR_WARN],
-            ['label' => 'Fechado', 'value' => (string) $kpis['fechado'], 'color' => self::COLOR_OK],
-            ['label' => 'SLA violado', 'value' => (string) $kpis['violado'], 'color' => self::COLOR_ALERT],
-            ['label' => 'SLA no prazo', 'value' => (string) $kpis['no_prazo'], 'color' => self::COLOR_OK],
-            ['label' => 'Satisfação', 'value' => $data['media_satisfacao']],
-        ]);
+        $pdf->drawSummaryCards(self::dashboardCards($data));
 
         $pdf->drawDonutPanels([
             ['title' => 'SLA Atendimento', 'caption' => 'chamados', 'series' => $data['sla_atendimento_series']],
@@ -164,7 +176,28 @@ class ReportPdf
             )
         );
 
-        $pdf->Output('dashboard-chamados.pdf', 'D');
+        return $pdf;
+    }
+
+    /**
+     * KPI cards of the dashboard, shared with the email attachment.
+     *
+     * @param array<string, mixed> $data DashboardRenderer::prepareData() output
+     * @return list<array{label: string, value: string, color?: string}>
+     */
+    public static function dashboardCards(array $data): array
+    {
+        $kpis = $data['kpis'];
+
+        return [
+            ['label' => 'Total', 'value' => (string) $kpis['total']],
+            ['label' => 'Em atendimento', 'value' => (string) $kpis['em_atendimento'], 'color' => self::COLOR_INFO],
+            ['label' => 'Pendente', 'value' => (string) $kpis['pendente'], 'color' => self::COLOR_WARN],
+            ['label' => 'Fechado', 'value' => (string) $kpis['fechado'], 'color' => self::COLOR_OK],
+            ['label' => 'SLA violado', 'value' => (string) $kpis['violado'], 'color' => self::COLOR_ALERT],
+            ['label' => 'SLA no prazo', 'value' => (string) $kpis['no_prazo'], 'color' => self::COLOR_OK],
+            ['label' => 'Satisfação', 'value' => $data['media_satisfacao']],
+        ];
     }
 
     /**
@@ -175,7 +208,7 @@ class ReportPdf
      * @param list<string> $visible
      * @return list<array{key: string, label: string, field: string, width: string, align: string}>
      */
-    private static function pdfColumns(array $visible): array
+    public static function pdfColumns(array $visible): array
     {
         $columns = array_values(array_filter(
             DashboardColumns::describe($visible),
@@ -202,7 +235,7 @@ class ReportPdf
         return $result;
     }
 
-    private static function dashboardFontSize(int $columns): float
+    public static function dashboardFontSize(int $columns): float
     {
         return match (true) {
             $columns <= 8  => 8.0,

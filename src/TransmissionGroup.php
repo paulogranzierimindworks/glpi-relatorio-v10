@@ -19,8 +19,9 @@ use Session;
 
 /**
  * A named "Grupo de Transmissão": one report type, one schedule, one message
- * template and the attachment formats (PDF/HTML) to send. The entities that
- * receive it, and their recipients, live in {@see TransmissionGroupEntity}.
+ * template and the PDF attachment to send, whose pages are configured in
+ * {@see AttachmentConfig}. The entities that receive it, and their recipients,
+ * live in {@see TransmissionGroupEntity}.
  *
  * Replaces the single global {@see MailConfig} singleton: an installation can
  * now have several groups, each targeting a different report and audience.
@@ -89,20 +90,21 @@ class TransmissionGroup extends CommonDBTM
     public static function getDefaults(): array
     {
         return [
-            'name'         => '',
-            'comment'      => '',
-            'is_active'    => 0,
-            'report_type'  => self::REPORT_COMERCIAL,
-            'send_pdf'     => 0,
-            'send_html'    => 0,
-            'frequency'    => ReportScheduler::FREQ_MONTHLY,
-            'send_hour'    => 8,
-            'send_weekday' => 1,
-            'send_day'     => 1,
-            'window_type'  => ReportScheduler::WINDOW_PREVIOUS_MONTH,
-            'window_days'  => 30,
-            'subject'      => self::DEFAULT_SUBJECTS[self::REPORT_COMERCIAL],
-            'body_html'    => '',
+            'name'              => '',
+            'comment'           => '',
+            'is_active'         => 0,
+            'report_type'       => self::REPORT_COMERCIAL,
+            'send_pdf'          => 0,
+            'send_html'         => 0,
+            'frequency'         => ReportScheduler::FREQ_MONTHLY,
+            'send_hour'         => 8,
+            'send_weekday'      => 1,
+            'send_day'          => 1,
+            'window_type'       => ReportScheduler::WINDOW_PREVIOUS_MONTH,
+            'window_days'       => 30,
+            'subject'           => self::DEFAULT_SUBJECTS[self::REPORT_COMERCIAL],
+            'body_html'         => '',
+            'attachment_config' => '',
         ];
     }
 
@@ -181,7 +183,29 @@ class TransmissionGroup extends CommonDBTM
         // The HTML attachment is no longer offered in the form; saving a group clears it.
         $input['send_html'] = 0;
 
+        $report_type = (string) ($input['report_type'] ?? $this->fields['report_type'] ?? $defaults['report_type']);
+        if (array_key_exists('attachment', $input)) {
+            $attachment = Sanitizer::unsanitize($input['attachment']);
+            $input['attachment_config'] = self::storableAttachment(
+                AttachmentConfig::normalize(is_array($attachment) ? $attachment : [], $report_type)
+            );
+            unset($input['attachment']);
+        } elseif ($is_add) {
+            $input['attachment_config'] = self::storableAttachment(AttachmentConfig::defaults($report_type));
+        }
+
         return $input;
+    }
+
+    /**
+     * JSON ready for CommonDBTM: GLPI 10 expects input values already escaped
+     * for SQL. Not HTML-encoded, so the stored JSON stays readable as is.
+     *
+     * @param array<string, mixed> $config
+     */
+    private static function storableAttachment(array $config): string
+    {
+        return Sanitizer::dbEscape(AttachmentConfig::toJson($config));
     }
 
     private static function clamp(mixed $value, int $min, int $max, int $default): int
@@ -373,12 +397,46 @@ class TransmissionGroup extends CommonDBTM
 
         $self_url = self::getFormURL();
 
-        echo "<form method='post' action='" . htmlescape($self_url) . "'>";
+        $entities = $is_new ? [] : Report::getSelectableEntities((string) $this->fields['report_type']);
+
+        echo "<form method='post' action='" . htmlescape($self_url) . "' id='relatoriotransmissiongroup-form'>";
         if (!$is_new) {
             echo Html::hidden('id', ['value' => (int) $ID]);
         }
 
+        // -------------------------------------------------------------- tabs --
+        // One tab per part of the configuration, all inside the same form so
+        // "Salvar" keeps saving everything at once.
+        $tabs = [
+            'geral'       => ['ti ti-settings', __s('Geral', 'relatorioglpicomercial')],
+            'agendamento' => ['ti ti-calendar-time', __s('Agendamento', 'relatorioglpicomercial')],
+            'email'       => ['ti ti-mail', __s('Conteúdo do e-mail', 'relatorioglpicomercial')],
+            'anexo'       => ['ti ti-file-type-pdf', __s('Anexo PDF', 'relatorioglpicomercial')],
+        ];
+        if (!$is_new) {
+            $tabs['destinatarios'] = ['ti ti-users', __s('Destinatários', 'relatorioglpicomercial')];
+        }
+
+        echo "<ul class='nav nav-tabs mb-3' id='relatoriotransmissiongroup-tabs' role='tablist'>";
+        foreach ($tabs as $key => [$icon, $label]) {
+            $active = $key === array_key_first($tabs);
+            echo "<li class='nav-item' role='presentation'>";
+            echo "<button type='button' class='nav-link" . ($active ? ' active' : '') . "' data-bs-toggle='tab'"
+                . " data-bs-target='#relatoriotransmissiongroup-tab-$key' role='tab'"
+                . " aria-selected='" . ($active ? 'true' : 'false') . "'>"
+                . "<i class='$icon me-2'></i>$label</button>";
+            echo "</li>";
+        }
+        echo "</ul>";
+
+        $pane = static function (string $key, bool $active = false): void {
+            echo "<div class='tab-pane fade" . ($active ? ' show active' : '') . "' id='relatoriotransmissiongroup-tab-$key' role='tabpanel'>";
+        };
+
+        echo "<div class='tab-content'>";
+
         // ---------------------------------------------------------- identity --
+        $pane('geral', true);
         echo "<div class='card mb-3'>";
         echo "<div class='card-header'><h3 class='card-title'>" . __s('Grupo de Transmissão', 'relatorioglpicomercial') . "</h3></div>";
         echo "<div class='card-body'>";
@@ -417,6 +475,7 @@ class TransmissionGroup extends CommonDBTM
         echo "</div>";
 
         echo "</div></div>";
+        echo "</div>";
 
         // ---------------------------------------------------------- schedule --
         $hours = [];
@@ -428,6 +487,7 @@ class TransmissionGroup extends CommonDBTM
             $days[$d] = (string) $d;
         }
 
+        $pane('agendamento');
         echo "<div class='card mb-3'>";
         echo "<div class='card-header'><h3 class='card-title'>" . __s('Agendamento', 'relatorioglpicomercial') . "</h3></div>";
         echo "<div class='card-body'>";
@@ -474,8 +534,10 @@ class TransmissionGroup extends CommonDBTM
         echo "</div>";
 
         echo "</div></div>";
+        echo "</div>";
 
         // ----------------------------------------------------------- message --
+        $pane('email');
         echo "<div class='card mb-3'>";
         echo "<div class='card-header'><h3 class='card-title'>" . __s('Conteúdo do e-mail', 'relatorioglpicomercial') . "</h3></div>";
         echo "<div class='card-body'>";
@@ -510,13 +572,18 @@ class TransmissionGroup extends CommonDBTM
         echo "</div>";
 
         echo "</div></div>";
+        echo "</div>";
+
+        // -------------------------------------------------------- attachment --
+        $pane('anexo');
+        AttachmentForm::showCard($this->fields, $entities, $is_new);
+        echo "</div>";
 
         // -------------------------------------------------------- recipients --
         if (!$is_new) {
-            $report_type    = (string) $this->fields['report_type'];
-            $entities       = Report::getSelectableEntities($report_type);
             $entity_configs = TransmissionGroupEntity::getAllForGroup((int) $this->fields['id']);
 
+            $pane('destinatarios');
             echo "<div class='card mb-3'>";
             echo "<div class='card-header'>";
             echo "<h3 class='card-title'>" . __s('Destinatários por cliente', 'relatorioglpicomercial') . "</h3>";
@@ -553,24 +620,61 @@ class TransmissionGroup extends CommonDBTM
                     ]);
                     echo "</td>";
 
-                    echo "<td>" . htmlescape($entity['nome']) . "</td>";
+                    echo "<td>" . htmlescape($entity['nome']);
+                    echo "<div><button type='button' class='btn btn-link btn-sm p-0' data-bs-toggle='collapse'"
+                        . " data-bs-target='#relatoriotransmissiongroup-attach-$entities_id'>"
+                        . __s('Dados do anexo', 'relatorioglpicomercial') . "</button></div>";
+                    echo "</td>";
 
                     echo "<td>";
                     echo "<input type='text' class='form-control' name='emails[$entities_id]'"
                         . " value='" . htmlescape($entity_config['emails'] ?? '') . "'"
                         . " placeholder='" . __s('fulano@cliente.com, gestor@cliente.com', 'relatorioglpicomercial') . "'>";
+                    echo "<div class='mt-2' style='min-width:260px'>"
+                        . "<div class='small text-muted mb-1' style='white-space:nowrap;word-break:keep-all;overflow-wrap:normal;writing-mode:horizontal-tb;width:auto'>"
+                        . __s('Incluir e-mails dos usuários do grupo GLPI', 'relatorioglpicomercial') . "</div>";
+                    \Group::dropdown([
+                        'name'    => "glpi_groups[$entities_id]",
+                        'value'   => (int) ($entity_config['groups_id'] ?? 0),
+                        'entity'  => $entities_id,
+                        'width'   => '100%',
+                    ]);
+                    echo "</div>";
                     echo "</td>";
 
                     echo "<td>" . htmlescape($entity_config['last_sent_period'] ?? '-') . "</td>";
 
                     echo "</tr>";
+
+                    // Values of this client that override the attachment's defaults.
+                    echo "<tr class='collapse' id='relatoriotransmissiongroup-attach-$entities_id'"
+                        . " data-name='" . htmlescape(mb_strtolower($entity['nome'])) . "'>";
+                    echo "<td></td><td colspan='3'><div class='row g-2'>";
+                    foreach (
+                        [
+                            'contract_number'  => __s('Nº do contrato', 'relatorioglpicomercial'),
+                            'client_rep_name'  => __s('Responsável do cliente (aceite)', 'relatorioglpicomercial'),
+                            'client_rep_title' => __s('Cargo do responsável', 'relatorioglpicomercial'),
+                        ] as $field => $label
+                    ) {
+                        echo "<div class='col-md-4'>";
+                        echo "<label class='form-label mb-1'>" . $label . "</label>";
+                        echo "<input type='text' class='form-control form-control-sm' maxlength='255' name='{$field}[$entities_id]'"
+                            . " value='" . htmlescape($entity_config[$field] ?? '') . "'"
+                            . " placeholder='" . __s('Padrão do grupo', 'relatorioglpicomercial') . "'>";
+                        echo "</div>";
+                    }
+                    echo "</div></td></tr>";
                 }
 
                 echo "</tbody></table></div>";
             }
 
             echo "</div>";
+            echo "</div>";
         }
+
+        echo "</div>";
 
         echo "<div class='mb-3'>";
         echo Html::submit(_sx('button', 'Save'), ['name' => $is_new ? 'add' : 'update', 'class' => 'btn btn-primary']);
@@ -642,6 +746,35 @@ function plugin_relatorioglpicomercial_resetBody() {
     document.getElementById('relatoriotransmissiongroup-body').value
         = window.plugin_relatorioglpicomercial_default_bodies[reportType];
 }
+
+// Reopen the tab that was in use: saving reloads the page.
+(function () {
+    var tabs = document.getElementById('relatoriotransmissiongroup-tabs');
+    var key  = 'relatoriotransmissiongroup-tab';
+
+    tabs.addEventListener('shown.bs.tab', function (event) {
+        try {
+            sessionStorage.setItem(key, event.target.dataset.bsTarget);
+        } catch (e) {}
+    });
+
+    var stored = null;
+    try {
+        stored = sessionStorage.getItem(key);
+    } catch (e) {}
+    var button = stored !== null ? tabs.querySelector('[data-bs-target="' + stored + '"]') : null;
+    if (button !== null) {
+        bootstrap.Tab.getOrCreateInstance(button).show();
+    }
+
+    // A required field in a hidden tab would block the save silently: show it.
+    document.getElementById('relatoriotransmissiongroup-form').addEventListener('invalid', function (event) {
+        var pane = event.target.closest('.tab-pane');
+        if (pane !== null && !pane.classList.contains('active')) {
+            bootstrap.Tab.getOrCreateInstance(tabs.querySelector('[data-bs-target="#' + pane.id + '"]')).show();
+        }
+    }, true);
+})();
 
 function plugin_relatorioglpicomercial_filter(term) {
     term = term.toLowerCase();

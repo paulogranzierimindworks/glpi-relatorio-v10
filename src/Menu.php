@@ -37,7 +37,7 @@ class Menu extends CommonGLPI
         $links = ['search' => $page];
 
         if (Session::haveRight(Report::RIGHTNAME, UPDATE)) {
-            $links['config'] = '/plugins/relatorioglpicomercial/front/config.form.php';
+            $links['config'] = '/plugins/relatorioglpicomercial/front/transmissiongroup.php';
         }
 
         return [

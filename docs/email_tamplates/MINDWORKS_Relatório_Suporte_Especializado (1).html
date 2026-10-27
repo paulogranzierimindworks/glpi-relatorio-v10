@@ -1,0 +1,2908 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Relatório Mensal - Suporte Especializado Mindworks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Regras essenciais para formato Paisagem (Landscape) e conversão para PDF */
+      @page {
+        size: A4 landscape;
+        margin: 0;
+      }
+      @media print {
+        body {
+          margin: 0 !important;
+          background: #ffffff !important;
+        }
+        .page {
+          margin: 0 !important;
+          box-shadow: none !important;
+          page-break-after: always !important;
+        }
+        * {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #cbd5e1;
+        color: #1f2937;
+        font-family: "Montserrat", sans-serif;
+        font-optical-sizing: auto;
+        font-style: normal;
+      }
+      .page {
+        width: 297mm;
+        height: 210mm;
+        max-height: 210mm;
+        box-sizing: border-box;
+        margin: 18px auto;
+        background: #ffffff;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+        page-break-after: always;
+        position: relative;
+        overflow: hidden;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      .toc-item a {
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.15s ease;
+      }
+      .toc-item:hover a {
+        color: #005096 !important;
+        text-decoration: underline;
+      }
+
+      .bg-color-capa {
+        opacity: 0.15;
+        background: #2f64f7;
+        width: 500px;
+
+        height: 100%;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        filter: blur(120px);
+        transform: translateX(-50%);
+      }
+
+      .footer-capa {
+        height: 18%;
+        background: linear-gradient(90deg,#005295 0%, rgba(3, 28, 73, 1) 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ==========================================================================
+       PÁGINA 1: CAPA (FORMATO PAISAGEM COM RESPIRO ELEGANTE)
+       ========================================================================== -->
+    <div class="page" style="background: #000e27">
+      <table
+        width="100%"
+        height="82%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="height: 82%"
+      >
+        <div class="bg-color-capa"></div>
+        <tr>
+          <td valign="middle" style="padding: 0 55px">
+            <div
+              style="
+                font-size: 14px;
+                font-weight: normal;
+                color: #6be3f7;
+                letter-spacing: 2.5px;
+                text-transform: uppercase;
+                margin-bottom: 10px;
+              "
+            >
+              RELATÓRIO {{REPORT_YEAR}}
+            </div>
+            <div
+              style="
+                font-size: 26px;
+                color: #ffffff;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                margin-bottom: 10px;
+              "
+            >
+              SUPORTE ESPECIALIZADO
+            </div>
+            <div
+              style="
+                font-size: 32px;
+                font-weight: bold;
+                color: #ffffff;
+                margin-bottom: 30px;
+              "
+            >
+              {{CLIENT_NAME}} – {{REPORTING_PERIOD_SHORT}}
+            </div>
+
+            <!-- Linha de Circuito Neon Ciano -->
+            <svg
+              viewBox="0 0 800 40"
+              width="760"
+              height="38"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="8"
+                cy="8"
+                r="7"
+                fill="#6be3f7"
+                stroke="#000e27"
+                stroke-width="2"
+              />
+              <path
+                d="M 8 8 L 40 32 L 780 32"
+                stroke="#6be3f7"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <circle
+                cx="780"
+                cy="32"
+                r="7"
+                fill="#6be3f7"
+                stroke="#000e27"
+                stroke-width="2"
+              />
+            </svg>
+          </td>
+        </tr>
+      </table>
+
+      <!-- Rodapé Azul da Capa com Logo Branca Oficial -->
+      <table
+        width="100%"
+        height="18%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        class="footer-capa"
+      >
+        <tr>
+          <td align="center" valign="middle">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="230"
+              height="32"
+              viewBox="0 0 204.721 28.571"
+              role="img"
+              aria-label="Mindworks"
+              style="display: block"
+            >
+              <g transform="translate(-11.905 -10.714)" fill="#ffffff">
+                <path d="M105.219,17.892h-1.6V32.108h1.6Z"></path>
+                <path
+                  d="M119.588,17.892h1.574V32.108h-1.279L110.7,20.451V32.108h-1.561V17.892h1.5l8.956,11.4Z"
+                ></path>
+                <path
+                  d="M129.978,19.377h-3.327v11.26h3.327a5.633,5.633,0,1,0,0-11.247Zm0,12.808h-4.939V17.892h4.939c4.465,0,7.562,3.071,7.562,7.089a7.127,7.127,0,0,1-7.562,7.127"
+                ></path>
+                <path
+                  d="M148.4,17.854h1.318l3.9,11.887,4.069-11.848h1.676l-5.08,14.318h-1.356l-3.9-11.528L145.114,32.21h-1.343l-5.08-14.318h1.753L144.5,29.74Z"
+                ></path>
+                <path
+                  d="M91.183,32.21H89.865l-3.9-11.887L81.894,32.172H80.218L85.3,17.854h1.356l3.9,11.541,3.915-11.541h1.344l5.08,14.318H99.142L95.086,20.323Z"
+                ></path>
+                <path
+                  d="M167.864,19.133a5.593,5.593,0,0,0-5.566,5.847,5.656,5.656,0,0,0,5.6,5.886,5.59,5.59,0,0,0,5.566-5.847,5.655,5.655,0,0,0-5.6-5.886Zm0,13.217a7.139,7.139,0,0,1-7.229-7.332,7.255,7.255,0,1,1,14.5,0,7.2,7.2,0,0,1-7.268,7.37"
+                ></path>
+                <path
+                  d="M184.293,19.377H179.9v5.771h4.363c2.137,0,3.66-1.1,3.66-2.943S186.647,19.377,184.293,19.377Zm3.838,12.8-4.12-5.527H179.9v5.527h-1.663V17.892h6.116c3.122,0,5.118,1.689,5.118,4.248a4.171,4.171,0,0,1-3.839,4.158L190,32.108Z"
+                ></path>
+                <path
+                  d="M204.855,32.108h-2.009l-5.464-6.884-3.032,3.071v3.813h-1.6V17.892h1.6v8.5l8.176-8.5H204.6l-6.1,6.218Z"
+                ></path>
+                <path
+                  d="M211.994,24.226c3.174.691,4.632,1.843,4.632,4.043,0,2.457-2.034,4.043-4.849,4.043a8.33,8.33,0,0,1-5.809-2.278l1-1.177a6.77,6.77,0,0,0,4.875,2.009c1.906,0,3.173-1,3.173-2.431s-.717-2.1-3.7-2.725c-3.275-.716-4.772-1.766-4.772-4.12s1.97-3.839,4.67-3.839a7.422,7.422,0,0,1,5,1.753l-.934,1.279a6.246,6.246,0,0,0-4.108-1.548c-1.842,0-3.032,1.011-3.032,2.316s.729,2.111,3.839,2.777"
+                ></path>
+                <path
+                  d="M70.89,10.714l-7.818,20.28-7.831-20.28h-8.33l-7.818,20.28-7.83-20.28h-8.33L11.9,39.286h7.37l7.831-20.268,7.818,20.268h8.33L51.07,19.018,58.9,39.286h8.33L78.26,10.714Z"
+                ></path>
+              </g>
+            </svg>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- ==========================================================================
+       PÁGINA 2: AVISO DE CONFIDENCIALIDADE
+       ========================================================================== -->
+    <div class="page">
+      <!-- Header com Respiro Amplo -->
+      <table
+        width="100%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="border-bottom: 1px solid #e5e7eb; padding: 15px 45px 12px 45px"
+      >
+        <tr>
+          <td
+            align="left"
+            style="
+              font-size: 11px;
+              font-weight: bold;
+              color: #005295;
+              text-transform: uppercase;
+            "
+          >
+            RELATÓRIO {{CLIENT_NAME}}
+          </td>
+          <td align="right">
+            <span
+              style="
+                font-size: 11px;
+                font-weight: bold;
+                color: #64748b;
+                border: 1px solid #cbd5e1;
+                padding: 3px 12px;
+                border-radius: 3px;
+              "
+            >
+              {{REPORT_YEAR}}
+            </span>
+          </td>
+        </tr>
+      </table>
+
+      <table
+        width="100%"
+        height="76%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="padding: 40px 45px"
+      >
+        <tr>
+          <td valign="bottom" style="padding-bottom: 30px">
+            <div
+              style="
+                font-size: 11.5px;
+                line-height: 1.75;
+                color: #334155;
+                text-align: justify;
+                font-style: italic;
+              "
+            >
+              <p style="margin: 0 0 14px 0">
+                Todas as informações contidas neste Relatório são consideradas
+                privilegiadas e pertencentes a
+                <strong style="color: #e11d48; font-style: normal"
+                  >{{CLIENT_NAME}}</strong
+                >
+                para uso interno. Este material inclui método de trabalho
+                considerado sigiloso e a sua divulgação só deverá ser praticada
+                com a finalidade específica de avaliação de seu conteúdo para
+                aprovação e contratação destes serviços. Sendo assim, nenhuma
+                parte deste relatório poderá ser reproduzida, por quaisquer
+                meios, sem a permissão da
+                <strong style="color: #e11d48; font-style: normal"
+                  >Mindworks Informática Ltda</strong
+                >.
+              </p>
+              <p style="margin: 0 0 14px 0">
+                As informações contidas neste documento representam a visão
+                atual da Mindworks Informática em relação às questões de
+                segurança discutidas até a data de sua divulgação e publicação.
+              </p>
+              <p style="margin: 0 0 18px 0">
+                As logomarcas utilizadas são registradas pelos respectivos
+                fabricantes.
+              </p>
+              <p
+                style="
+                  margin: 0;
+                  font-size: 10.5px;
+                  color: #1e293b;
+                  font-style: normal;
+                  font-weight: bold;
+                "
+              >
+                &copy; {{REPORT_YEAR}} Mindworks Informática Ltda
+              </p>
+            </div>
+          </td>
+        </tr>
+      </table>
+
+      <!-- Footer com Respiro Amplo -->
+      <table
+        width="100%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          border-top: 1px solid #f1f5f9;
+          padding: 12px 45px 15px 45px;
+        "
+      >
+        <tr>
+          <td align="left" style="font-size: 10px; color: #94a3b8">
+            Confidencial e Privilegiado
+          </td>
+          <td align="right">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="125"
+              height="17"
+              viewBox="0 0 204.721 28.571"
+              role="img"
+              aria-label="Mindworks"
+              style="display: block"
+            >
+              <g transform="translate(-11.905 -10.714)" fill="#005295">
+                <path d="M105.219,17.892h-1.6V32.108h1.6Z"></path>
+                <path
+                  d="M119.588,17.892h1.574V32.108h-1.279L110.7,20.451V32.108h-1.561V17.892h1.5l8.956,11.4Z"
+                ></path>
+                <path
+                  d="M129.978,19.377h-3.327v11.26h3.327a5.633,5.633,0,1,0,0-11.247Zm0,12.808h-4.939V17.892h4.939c4.465,0,7.562,3.071,7.562,7.089a7.127,7.127,0,0,1-7.562,7.127"
+                ></path>
+                <path
+                  d="M148.4,17.854h1.318l3.9,11.887,4.069-11.848h1.676l-5.08,14.318h-1.356l-3.9-11.528L145.114,32.21h-1.343l-5.08-14.318h1.753L144.5,29.74Z"
+                ></path>
+                <path
+                  d="M91.183,32.21H89.865l-3.9-11.887L81.894,32.172H80.218L85.3,17.854h1.356l3.9,11.541,3.915-11.541h1.344l5.08,14.318H99.142L95.086,20.323Z"
+                ></path>
+                <path
+                  d="M167.864,19.133a5.593,5.593,0,0,0-5.566,5.847,5.656,5.656,0,0,0,5.6,5.886,5.59,5.59,0,0,0,5.566-5.847,5.655,5.655,0,0,0-5.6-5.886Zm0,13.217a7.139,7.139,0,0,1-7.229-7.332,7.255,7.255,0,1,1,14.5,0,7.2,7.2,0,0,1-7.268,7.37"
+                ></path>
+                <path
+                  d="M184.293,19.377H179.9v5.771h4.363c2.137,0,3.66-1.1,3.66-2.943S186.647,19.377,184.293,19.377Zm3.838,12.8-4.12-5.527H179.9v5.527h-1.663V17.892h6.116c3.122,0,5.118,1.689,5.118,4.248a4.171,4.171,0,0,1-3.839,4.158L190,32.108Z"
+                ></path>
+                <path
+                  d="M204.855,32.108h-2.009l-5.464-6.884-3.032,3.071v3.813h-1.6V17.892h1.6v8.5l8.176-8.5H204.6l-6.1,6.218Z"
+                ></path>
+                <path
+                  d="M211.994,24.226c3.174.691,4.632,1.843,4.632,4.043,0,2.457-2.034,4.043-4.849,4.043a8.33,8.33,0,0,1-5.809-2.278l1-1.177a6.77,6.77,0,0,0,4.875,2.009c1.906,0,3.173-1,3.173-2.431s-.717-2.1-3.7-2.725c-3.275-.716-4.772-1.766-4.772-4.12s1.97-3.839,4.67-3.839a7.422,7.422,0,0,1,5,1.753l-.934,1.279a6.246,6.246,0,0,0-4.108-1.548c-1.842,0-3.032,1.011-3.032,2.316s.729,2.111,3.839,2.777"
+                ></path>
+                <path
+                  d="M70.89,10.714l-7.818,20.28-7.831-20.28h-8.33l-7.818,20.28-7.83-20.28h-8.33L11.9,39.286h7.37l7.831-20.268,7.818,20.268h8.33L51.07,19.018,58.9,39.286h8.33L78.26,10.714Z"
+                ></path>
+              </g>
+            </svg>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- ==========================================================================
+       PÁGINA 3: METADADOS (TABELA IDÊNTICA AO PDF DA CESAN - PÁG 3)
+       ========================================================================== -->
+    <div class="page">
+      <table
+        width="100%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="border-bottom: 1px solid #e5e7eb; padding: 15px 45px 12px 45px"
+      >
+        <tr>
+          <td
+            align="left"
+            style="
+              font-size: 11px;
+              font-weight: bold;
+              color: #005295;
+              text-transform: uppercase;
+            "
+          >
+            RELATÓRIO {{CLIENT_NAME}}
+          </td>
+          <td align="right">
+            <span
+              style="
+                font-size: 11px;
+                font-weight: bold;
+                color: #64748b;
+                border: 1px solid #cbd5e1;
+                padding: 3px 12px;
+                border-radius: 3px;
+              "
+            >
+              {{REPORT_YEAR}}
+            </span>
+          </td>
+        </tr>
+      </table>
+
+      <div style="padding: 35px 45px">
+        <!-- Card com borda azul arredondada idêntica ao original -->
+        <table
+          width="100%"
+          cellpadding="10"
+          cellspacing="0"
+          border="0"
+          style="
+            border: 1.5px solid #005096;
+            border-radius: 12px;
+            border-collapse: collapse;
+            background: #ffffff;
+          "
+        >
+          <tr style="border-bottom: 1px solid #cbd5e1">
+            <td
+              width="35%"
+              style="
+                font-size: 12px;
+                font-weight: bold;
+                color: #005096;
+                padding: 12px 18px;
+              "
+            >
+              VERSÃO
+            </td>
+            <td style="font-size: 12px; color: #1e293b; padding: 12px 18px">
+              {{REPORT_VERSION}}
+            </td>
+          </tr>
+          <tr style="border-bottom: 1px solid #cbd5e1">
+            <td
+              style="
+                font-size: 12px;
+                font-weight: bold;
+                color: #005096;
+                padding: 12px 18px;
+              "
+            >
+              PERÍODO DE REFERÊNCIA
+            </td>
+            <td style="font-size: 12px; color: #1e293b; padding: 12px 18px">
+              {{REPORTING_PERIOD}}
+            </td>
+          </tr>
+          <tr style="border-bottom: 1px solid #cbd5e1">
+            <td
+              style="
+                font-size: 12px;
+                font-weight: bold;
+                color: #005096;
+                padding: 12px 18px;
+              "
+            >
+              COODERNADOR
+            </td>
+            <td style="font-size: 12px; color: #1e293b; padding: 12px 18px">
+              {{COORDINATOR_NAME}}
+            </td>
+          </tr>
+          <tr style="border-bottom: 1px solid #cbd5e1">
+            <td
+              style="
+                font-size: 12px;
+                font-weight: bold;
+                color: #005096;
+                padding: 12px 18px;
+              "
+            >
+              REVISÃO
+            </td>
+            <td style="font-size: 12px; color: #1e293b; padding: 12px 18px">
+              {{REPORT_REVISION}}
+            </td>
+          </tr>
+          <tr style="border-bottom: 1px solid #cbd5e1">
+            <td
+              style="
+                font-size: 12px;
+                font-weight: bold;
+                color: #005096;
+                padding: 12px 18px;
+              "
+            >
+              CLIENTE
+            </td>
+            <td style="font-size: 12px; color: #1e293b; padding: 12px 18px">
+              {{CLIENT_NAME}}
+            </td>
+          </tr>
+          <tr style="border-bottom: 1px solid #cbd5e1">
+            <td
+              style="
+                font-size: 12px;
+                font-weight: bold;
+                color: #005096;
+                padding: 12px 18px;
+              "
+            >
+              GERENTE
+            </td>
+            <td style="font-size: 12px; color: #1e293b; padding: 12px 18px">
+              {{MANAGER_NAME}}
+            </td>
+          </tr>
+          <tr>
+            <td
+              style="
+                font-size: 12px;
+                font-weight: bold;
+                color: #005096;
+                padding: 12px 18px;
+              "
+            >
+              PLANILHAS GERADOS EM
+            </td>
+            <td style="font-size: 12px; color: #1e293b; padding: 12px 18px">
+              {{DELIVERY_DATE}}
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Footer -->
+      <table
+        width="100%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          border-top: 1px solid #f1f5f9;
+          padding: 12px 45px 15px 45px;
+        "
+      >
+        <tr>
+          <td align="left" style="font-size: 10px; color: #94a3b8">
+            Identificação e Controle do Documento
+          </td>
+          <td align="right">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="125"
+              height="17"
+              viewBox="0 0 204.721 28.571"
+              role="img"
+              aria-label="Mindworks"
+              style="display: block"
+            >
+              <g transform="translate(-11.905 -10.714)" fill="#005295">
+                <path d="M105.219,17.892h-1.6V32.108h1.6Z"></path>
+                <path
+                  d="M119.588,17.892h1.574V32.108h-1.279L110.7,20.451V32.108h-1.561V17.892h1.5l8.956,11.4Z"
+                ></path>
+                <path
+                  d="M129.978,19.377h-3.327v11.26h3.327a5.633,5.633,0,1,0,0-11.247Zm0,12.808h-4.939V17.892h4.939c4.465,0,7.562,3.071,7.562,7.089a7.127,7.127,0,0,1-7.562,7.127"
+                ></path>
+                <path
+                  d="M148.4,17.854h1.318l3.9,11.887,4.069-11.848h1.676l-5.08,14.318h-1.356l-3.9-11.528L145.114,32.21h-1.343l-5.08-14.318h1.753L144.5,29.74Z"
+                ></path>
+                <path
+                  d="M91.183,32.21H89.865l-3.9-11.887L81.894,32.172H80.218L85.3,17.854h1.356l3.9,11.541,3.915-11.541h1.344l5.08,14.318H99.142L95.086,20.323Z"
+                ></path>
+                <path
+                  d="M167.864,19.133a5.593,5.593,0,0,0-5.566,5.847,5.656,5.656,0,0,0,5.6,5.886,5.59,5.59,0,0,0,5.566-5.847,5.655,5.655,0,0,0-5.6-5.886Zm0,13.217a7.139,7.139,0,0,1-7.229-7.332,7.255,7.255,0,1,1,14.5,0,7.2,7.2,0,0,1-7.268,7.37"
+                ></path>
+                <path
+                  d="M184.293,19.377H179.9v5.771h4.363c2.137,0,3.66-1.1,3.66-2.943S186.647,19.377,184.293,19.377Zm3.838,12.8-4.12-5.527H179.9v5.527h-1.663V17.892h6.116c3.122,0,5.118,1.689,5.118,4.248a4.171,4.171,0,0,1-3.839,4.158L190,32.108Z"
+                ></path>
+                <path
+                  d="M204.855,32.108h-2.009l-5.464-6.884-3.032,3.071v3.813h-1.6V17.892h1.6v8.5l8.176-8.5H204.6l-6.1,6.218Z"
+                ></path>
+                <path
+                  d="M211.994,24.226c3.174.691,4.632,1.843,4.632,4.043,0,2.457-2.034,4.043-4.849,4.043a8.33,8.33,0,0,1-5.809-2.278l1-1.177a6.77,6.77,0,0,0,4.875,2.009c1.906,0,3.173-1,3.173-2.431s-.717-2.1-3.7-2.725c-3.275-.716-4.772-1.766-4.772-4.12s1.97-3.839,4.67-3.839a7.422,7.422,0,0,1,5,1.753l-.934,1.279a6.246,6.246,0,0,0-4.108-1.548c-1.842,0-3.032,1.011-3.032,2.316s.729,2.111,3.839,2.777"
+                ></path>
+                <path
+                  d="M70.89,10.714l-7.818,20.28-7.831-20.28h-8.33l-7.818,20.28-7.83-20.28h-8.33L11.9,39.286h7.37l7.831-20.268,7.818,20.268h8.33L51.07,19.018,58.9,39.286h8.33L78.26,10.714Z"
+                ></path>
+              </g>
+            </svg>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- ==========================================================================
+       PÁGINA 4: SUMÁRIO & 1. VISÃO GERAL (PÁGS 4 E 5 DO PDF)
+       ========================================================================== -->
+    <div class="page">
+      <table
+        width="100%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="border-bottom: 1px solid #e5e7eb; padding: 15px 45px 12px 45px"
+      >
+        <tr>
+          <td
+            align="left"
+            style="
+              font-size: 11px;
+              font-weight: bold;
+              color: #005295;
+              text-transform: uppercase;
+            "
+          >
+            RELATÓRIO {{CLIENT_NAME}}
+          </td>
+          <td align="right">
+            <span
+              style="
+                font-size: 11px;
+                font-weight: bold;
+                color: #64748b;
+                border: 1px solid #cbd5e1;
+                padding: 3px 12px;
+                border-radius: 3px;
+              "
+            >
+              {{REPORT_YEAR}}
+            </span>
+          </td>
+        </tr>
+      </table>
+
+      <table
+        width="100%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="padding: 35px 45px"
+      >
+        <tr>
+          <!-- Coluna Esquerda: Sumário Exato -->
+          <td
+            width="48%"
+            valign="top"
+            style="padding-right: 35px; border-right: 1px solid #e5e7eb"
+          >
+            <div
+              style="
+                font-size: 18px;
+                font-weight: bold;
+                color: #005295;
+                margin-bottom: 18px;
+              "
+            >
+              Sumário
+            </div>
+            <table
+              width="100%"
+              cellpadding="4"
+              cellspacing="0"
+              border="0"
+              style="font-size: 11.5px; color: #1e293b"
+            >
+              <tr class="toc-item">
+                <td style="font-weight: bold">
+                  <a
+                    href="#visao-geral"
+                    style="text-decoration: none; color: #1e293b"
+                    >1. Visão Geral</a
+                  >
+                </td>
+                <td align="right" style="font-weight: bold">
+                  <a
+                    href="#visao-geral"
+                    style="text-decoration: none; color: #005295"
+                    >4</a
+                  >
+                </td>
+              </tr>
+              <tr class="toc-item">
+                <td style="font-weight: bold; padding-top: 8px">
+                  <a
+                    href="#detalhamento"
+                    style="text-decoration: none; color: #1e293b"
+                    >2. Detalhamento</a
+                  >
+                </td>
+                <td align="right" style="font-weight: bold; padding-top: 8px">
+                  <a
+                    href="#detalhamento"
+                    style="text-decoration: none; color: #005295"
+                    >5</a
+                  >
+                </td>
+              </tr>
+              <tr class="toc-item">
+                <td style="padding-left: 16px">
+                  <a
+                    href="#relatorio-incidentes"
+                    style="text-decoration: none; color: #334155"
+                    >2.1 Relatório de Incidentes</a
+                  >
+                </td>
+                <td align="right">
+                  <a
+                    href="#relatorio-incidentes"
+                    style="text-decoration: none; color: #005295"
+                    >5</a
+                  >
+                </td>
+              </tr>
+              <tr class="toc-item">
+                <td style="padding-left: 16px">
+                  <a
+                    href="#relatorio-chamados"
+                    style="text-decoration: none; color: #334155"
+                    >Relatório de Chamados</a
+                  >
+                </td>
+                <td align="right">
+                  <a
+                    href="#relatorio-chamados"
+                    style="text-decoration: none; color: #005295"
+                    >6</a
+                  >
+                </td>
+              </tr>
+              <tr class="toc-item">
+                <td style="padding-left: 16px">
+                  <a
+                    href="#relatorio-eventos"
+                    style="text-decoration: none; color: #334155"
+                    >2.2 Relatório de Eventos</a
+                  >
+                </td>
+                <td align="right">
+                  <a
+                    href="#relatorio-eventos"
+                    style="text-decoration: none; color: #005295"
+                    >7</a
+                  >
+                </td>
+              </tr>
+              <tr class="toc-item">
+                <td style="padding-left: 16px">
+                  <a
+                    href="#relatorio-justificativas"
+                    style="text-decoration: none; color: #334155"
+                    >2.3 Relatório de Justificativas</a
+                  >
+                </td>
+                <td align="right">
+                  <a
+                    href="#relatorio-justificativas"
+                    style="text-decoration: none; color: #005295"
+                    >7</a
+                  >
+                </td>
+              </tr>
+              <tr class="toc-item">
+                <td style="font-weight: bold; padding-top: 8px">
+                  <a
+                    href="#formalizacao-aceite"
+                    style="text-decoration: none; color: #1e293b"
+                    >3. Formalização e Aceite</a
+                  >
+                </td>
+                <td align="right" style="font-weight: bold; padding-top: 8px">
+                  <a
+                    href="#formalizacao-aceite"
+                    style="text-decoration: none; color: #005295"
+                    >8</a
+                  >
+                </td>
+              </tr>
+            </table>
+          </td>
+
+          <!-- Coluna Direita: 1. Visão Geral Exata -->
+          <td width="52%" valign="top" style="padding-left: 35px">
+            <div
+              id="visao-geral"
+              style="
+                font-size: 16px;
+                font-weight: bold;
+                color: #005295;
+                margin-bottom: 14px;
+              "
+            >
+              1. Visão Geral
+            </div>
+            <p
+              style="
+                font-size: 11.5px;
+                line-height: 1.75;
+                color: #334155;
+                text-align: justify;
+                margin: 0;
+              "
+            >
+              Foram executados serviços de suporte especializado ao ambiente de
+              firewall e monitoramento, prestados pelo Nível 3 de TI, em
+              atendimento ao usuário final e à equipe técnica de
+              <strong>{{CLIENT_NAME}}</strong>. Neste documento estão descritas
+              as demandas atendidas, em conformidade com o contrato vigente.
+            </p>
+          </td>
+        </tr>
+      </table>
+
+      <!-- Footer -->
+      <table
+        width="100%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          border-top: 1px solid #f1f5f9;
+          padding: 12px 45px 15px 45px;
+        "
+      >
+        <tr>
+          <td align="left" style="font-size: 10px; color: #94a3b8">
+            Sumário e Visão Geral
+          </td>
+          <td align="right">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="125"
+              height="17"
+              viewBox="0 0 204.721 28.571"
+              role="img"
+              aria-label="Mindworks"
+              style="display: block"
+            >
+              <g transform="translate(-11.905 -10.714)" fill="#005295">
+                <path d="M105.219,17.892h-1.6V32.108h1.6Z"></path>
+                <path
+                  d="M119.588,17.892h1.574V32.108h-1.279L110.7,20.451V32.108h-1.561V17.892h1.5l8.956,11.4Z"
+                ></path>
+                <path
+                  d="M129.978,19.377h-3.327v11.26h3.327a5.633,5.633,0,1,0,0-11.247Zm0,12.808h-4.939V17.892h4.939c4.465,0,7.562,3.071,7.562,7.089a7.127,7.127,0,0,1-7.562,7.127"
+                ></path>
+                <path
+                  d="M148.4,17.854h1.318l3.9,11.887,4.069-11.848h1.676l-5.08,14.318h-1.356l-3.9-11.528L145.114,32.21h-1.343l-5.08-14.318h1.753L144.5,29.74Z"
+                ></path>
+                <path
+                  d="M91.183,32.21H89.865l-3.9-11.887L81.894,32.172H80.218L85.3,17.854h1.356l3.9,11.541,3.915-11.541h1.344l5.08,14.318H99.142L95.086,20.323Z"
+                ></path>
+                <path
+                  d="M167.864,19.133a5.593,5.593,0,0,0-5.566,5.847,5.656,5.656,0,0,0,5.6,5.886,5.59,5.59,0,0,0,5.566-5.847,5.655,5.655,0,0,0-5.6-5.886Zm0,13.217a7.139,7.139,0,0,1-7.229-7.332,7.255,7.255,0,1,1,14.5,0,7.2,7.2,0,0,1-7.268,7.37"
+                ></path>
+                <path
+                  d="M184.293,19.377H179.9v5.771h4.363c2.137,0,3.66-1.1,3.66-2.943S186.647,19.377,184.293,19.377Zm3.838,12.8-4.12-5.527H179.9v5.527h-1.663V17.892h6.116c3.122,0,5.118,1.689,5.118,4.248a4.171,4.171,0,0,1-3.839,4.158L190,32.108Z"
+                ></path>
+                <path
+                  d="M204.855,32.108h-2.009l-5.464-6.884-3.032,3.071v3.813h-1.6V17.892h1.6v8.5l8.176-8.5H204.6l-6.1,6.218Z"
+                ></path>
+                <path
+                  d="M211.994,24.226c3.174.691,4.632,1.843,4.632,4.043,0,2.457-2.034,4.043-4.849,4.043a8.33,8.33,0,0,1-5.809-2.278l1-1.177a6.77,6.77,0,0,0,4.875,2.009c1.906,0,3.173-1,3.173-2.431s-.717-2.1-3.7-2.725c-3.275-.716-4.772-1.766-4.772-4.12s1.97-3.839,4.67-3.839a7.422,7.422,0,0,1,5,1.753l-.934,1.279a6.246,6.246,0,0,0-4.108-1.548c-1.842,0-3.032,1.011-3.032,2.316s.729,2.111,3.839,2.777"
+                ></path>
+                <path
+                  d="M70.89,10.714l-7.818,20.28-7.831-20.28h-8.33l-7.818,20.28-7.83-20.28h-8.33L11.9,39.286h7.37l7.831-20.268,7.818,20.268h8.33L51.07,19.018,58.9,39.286h8.33L78.26,10.714Z"
+                ></path>
+              </g>
+            </svg>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- ==========================================================================
+       PÁGINA 5: 2. DETALHAMENTO & 2.1 RELATÓRIO DE INCIDENTES (PAINEL DE INDICADORES CENTRALIZADO)
+       ========================================================================== -->
+    <div class="page">
+      <table
+        width="100%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="border-bottom: 1px solid #e5e7eb; padding: 15px 45px 12px 45px"
+      >
+        <tr>
+          <td
+            align="left"
+            style="
+              font-size: 11px;
+              font-weight: bold;
+              color: #005295;
+              text-transform: uppercase;
+            "
+          >
+            RELATÓRIO {{CLIENT_NAME}}
+          </td>
+          <td align="right">
+            <span
+              style="
+                font-size: 11px;
+                font-weight: bold;
+                color: #64748b;
+                border: 1px solid #cbd5e1;
+                padding: 3px 12px;
+                border-radius: 3px;
+              "
+            >
+              {{REPORT_YEAR}}
+            </span>
+          </td>
+        </tr>
+      </table>
+
+      <div style="padding: 16px 45px">
+        <div
+          id="detalhamento"
+          style="
+            font-size: 16px;
+            font-weight: bold;
+            color: #005295;
+            margin-bottom: 8px;
+          "
+        >
+          2. Detalhamento
+        </div>
+
+        <!-- ÁREA DA IMAGEM DO DETALHAMENTO (JPEG/PNG QUE A EQUIPE INCORPORA) -->
+        <div
+          style="
+            width: 100%;
+            text-align: center;
+            margin-bottom: 12px;
+            background: #001533;
+            border: 1px dashed #6be3f7;
+            border-radius: 4px;
+            overflow: hidden;
+          "
+        >
+          <img
+            src="{{URL_IMAGEM_DETALHAMENTO}}"
+            alt="Gráficos e Indicadores do Detalhamento"
+            style="
+              width: 100%;
+              max-height: 125px;
+              object-fit: contain;
+              display: block;
+            "
+            onerror="
+              this.style.display = 'none';
+              document.getElementById(
+                'placeholder-detalhamento',
+              ).style.display = 'block';
+            "
+          />
+          <div
+            id="placeholder-detalhamento"
+            style="
+              padding: 14px 20px;
+              color: #ffffff;
+              font-size: 11px;
+              background: #031c49;
+            "
+          >
+            📊
+            <strong
+              >[ESPAÇO RESERVADO PARA A IMAGEM DO ITEM 2: DETALHAMENTO]</strong
+            >
+            <div style="font-size: 9.5px; color: #6be3f7; margin-top: 4px">
+              Incorpore a imagem do gráfico ou dashboard através da tag mustache
+              &#123;&#123;URL_IMAGEM_DETALHAMENTO&#125;&#125;
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="relatorio-incidentes"
+          style="
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 12px;
+          "
+        >
+          2.1 Relatório de Incidentes
+        </div>
+
+        <!-- Quadro Externo com Linha Centralizada (Sem marca isolada, limpo) -->
+        <table
+          width="100%"
+          cellpadding="0"
+          cellspacing="0"
+          border="0"
+          style="
+            border: 1.5px solid #005096;
+            border-collapse: collapse;
+            background: #ffffff;
+          "
+        >
+          <!-- Topo Centralizado -->
+          <tr>
+            <td
+              align="center"
+              style="
+                padding: 10px 14px;
+                border-bottom: 1.5px solid #005096;
+                font-size: 12px;
+                font-weight: bold;
+                color: #000e27;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+              "
+            >
+              RELATÓRIO DE ATENDIMENTO - CONTRATO - {{CONTRACT_NUMBER}}
+            </td>
+          </tr>
+
+          <!-- Linha Período Centralizada -->
+          <tr>
+            <td style="padding: 0; border-bottom: 1.5px solid #005096">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td
+                    width="15%"
+                    style="
+                      background: #ffffff;
+                      border-right: 1px solid #005096;
+                      padding: 6px 12px;
+                      font-size: 11px;
+                      font-weight: bold;
+                      color: #000e27;
+                    "
+                  >
+                    Período
+                  </td>
+                  <td
+                    width="85%"
+                    align="center"
+                    style="
+                      padding: 6px 12px;
+                      font-size: 11px;
+                      font-weight: bold;
+                      color: #000e27;
+                    "
+                  >
+                    {{REPORT_YEAR}}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Faixa Azul Escura: PAINEL DE INDICADORES -->
+          <tr>
+            <td
+              align="center"
+              style="
+                background: #000e27;
+                color: #ffffff;
+                font-size: 12px;
+                font-weight: bold;
+                padding: 6px 10px;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+              "
+            >
+              PAINEL DE INDICADORES
+            </td>
+          </tr>
+
+          <!-- Tabela Interna de Indicadores -->
+          <tr>
+            <td>
+              <table
+                width="100%"
+                cellpadding="6"
+                cellspacing="0"
+                border="0"
+                style="border-collapse: collapse; font-size: 11px"
+              >
+                <thead>
+                  <tr style="background: #205493; color: #ffffff">
+                    <th
+                      align="center"
+                      width="10%"
+                      rowspan="2"
+                      style="border-right: 1px solid #ffffff; padding: 6px"
+                    >
+                      ID
+                    </th>
+                    <th
+                      align="left"
+                      width="46%"
+                      rowspan="2"
+                      style="border-right: 1px solid #ffffff; padding: 6px 12px"
+                    >
+                      Indicador
+                    </th>
+                    <th
+                      align="center"
+                      width="14%"
+                      rowspan="2"
+                      style="border-right: 1px solid #ffffff; padding: 6px"
+                    >
+                      Meta
+                    </th>
+                    <th
+                      align="center"
+                      colspan="3"
+                      style="padding: 4px; border-bottom: 1px solid #ffffff"
+                    >
+                      {{REPORT_YEAR}}
+                    </th>
+                  </tr>
+                  <tr
+                    style="background: #205493; color: #ffffff; font-size: 10px"
+                  >
+                    <th
+                      align="center"
+                      width="10%"
+                      style="border-right: 1px solid #ffffff; padding: 4px"
+                    >
+                      atendido
+                    </th>
+                    <th
+                      align="center"
+                      width="10%"
+                      style="border-right: 1px solid #ffffff; padding: 4px"
+                    >
+                      não atend.
+                    </th>
+                    <th align="center" width="10%" style="padding: 4px">
+                      indicador
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    style="
+                      border-bottom: 1px solid #cbd5e1;
+                      background: #ffffff;
+                    "
+                  >
+                    <td
+                      align="center"
+                      style="
+                        border-right: 1px solid #cbd5e1;
+                        font-weight: bold;
+                        color: #005096;
+                        padding: 7px;
+                      "
+                    >
+                      SLA01
+                    </td>
+                    <td
+                      style="border-right: 1px solid #cbd5e1; padding: 7px 12px"
+                    >
+                      Prazo de atendimento dos chamados
+                    </td>
+                    <td
+                      align="center"
+                      style="border-right: 1px solid #cbd5e1; padding: 7px"
+                    >
+                      &ge; 90%
+                    </td>
+                    <td
+                      align="center"
+                      style="border-right: 1px solid #cbd5e1; padding: 7px"
+                    >
+                      17
+                    </td>
+                    <td
+                      align="center"
+                      style="border-right: 1px solid #cbd5e1; padding: 7px"
+                    >
+                      0
+                    </td>
+                    <td
+                      align="center"
+                      style="font-weight: bold; color: #000e27; padding: 7px"
+                    >
+                      100,00%
+                    </td>
+                  </tr>
+                  <tr
+                    style="
+                      border-bottom: 1px solid #cbd5e1;
+                      background: #f8fafc;
+                    "
+                  >
+                    <td
+                      align="center"
+                      style="
+                        border-right: 1px solid #cbd5e1;
+                        font-weight: bold;
+                        color: #005096;
+                        padding: 7px;
+                      "
+                    >
+                      SLA02
+                    </td>
+                    <td
+                      style="border-right: 1px solid #cbd5e1; padding: 7px 12px"
+                    >
+                      Disponibilidade dos serviços
+                    </td>
+                    <td
+                      align="center"
+                      style="border-right: 1px solid #cbd5e1; padding: 7px"
+                    >
+                      &ge; 99,5%
+                    </td>
+                    <td
+                      align="center"
+                      style="border-right: 1px solid #cbd5e1; padding: 7px"
+                    >
+                      0
+                    </td>
+                    <td
+                      align="center"
+                      style="border-right: 1px solid #cbd5e1; padding: 7px"
+                    >
+                      0
+                    </td>
+                    <td
+                      align="center"
+                      style="font-weight: bold; color: #000e27; padding: 7px"
+                    >
+                      100,00%
+                    </td>
+                  </tr>
+                  <tr
+                    style="
+                      border-bottom: 1.5px solid #005096;
+                      background: #ffffff;
+                    "
+                  >
+                    <td
+                      align="center"
+                      style="
+                        border-right: 1px solid #cbd5e1;
+                        font-weight: bold;
+                        color: #005096;
+                        padding: 7px;
+                      "
+                    >
+                      SLA03
+                    </td>
+                    <td
+                      style="border-right: 1px solid #cbd5e1; padding: 7px 12px"
+                    >
+                      Qualidade da gestão dos serviços
+                    </td>
+                    <td
+                      align="center"
+                      style="border-right: 1px solid #cbd5e1; padding: 7px"
+                    >
+                      =100%
+                    </td>
+                    <td
+                      align="center"
+                      style="border-right: 1px solid #cbd5e1; padding: 7px"
+                    >
+                      0
+                    </td>
+                    <td
+                      align="center"
+                      style="border-right: 1px solid #cbd5e1; padding: 7px"
+                    >
+                      0
+                    </td>
+                    <td
+                      align="center"
+                      style="font-weight: bold; color: #000e27; padding: 7px"
+                    >
+                      75,00%
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Linha de Observação -->
+          <tr>
+            <td
+              style="
+                padding: 10px 16px;
+                font-size: 10px;
+                line-height: 1.5;
+                color: #334155;
+                text-align: center;
+              "
+            >
+              <strong>OBS:</strong> Os resultados dos SLAs neste painel refletem
+              os dados brutos da ferramenta de gerenciamento de chamados Service
+              Manager. O painel com os dados justificados pode ser visto na
+              última página deste relatório.
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Footer com Respiro Amplo -->
+      <table
+        width="100%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          border-top: 1px solid #f1f5f9;
+          padding: 12px 45px 15px 45px;
+        "
+      >
+        <tr>
+          <td align="left" style="font-size: 10px; color: #94a3b8">
+            Detalhamento &bull; Relatório de Incidentes
+          </td>
+          <td align="right">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="125"
+              height="17"
+              viewBox="0 0 204.721 28.571"
+              role="img"
+              aria-label="Mindworks"
+              style="display: block"
+            >
+              <g transform="translate(-11.905 -10.714)" fill="#005295">
+                <path d="M105.219,17.892h-1.6V32.108h1.6Z"></path>
+                <path
+                  d="M119.588,17.892h1.574V32.108h-1.279L110.7,20.451V32.108h-1.561V17.892h1.5l8.956,11.4Z"
+                ></path>
+                <path
+                  d="M129.978,19.377h-3.327v11.26h3.327a5.633,5.633,0,1,0,0-11.247Zm0,12.808h-4.939V17.892h4.939c4.465,0,7.562,3.071,7.562,7.089a7.127,7.127,0,0,1-7.562,7.127"
+                ></path>
+                <path
+                  d="M148.4,17.854h1.318l3.9,11.887,4.069-11.848h1.676l-5.08,14.318h-1.356l-3.9-11.528L145.114,32.21h-1.343l-5.08-14.318h1.753L144.5,29.74Z"
+                ></path>
+                <path
+                  d="M91.183,32.21H89.865l-3.9-11.887L81.894,32.172H80.218L85.3,17.854h1.356l3.9,11.541,3.915-11.541h1.344l5.08,14.318H99.142L95.086,20.323Z"
+                ></path>
+                <path
+                  d="M167.864,19.133a5.593,5.593,0,0,0-5.566,5.847,5.656,5.656,0,0,0,5.6,5.886,5.59,5.59,0,0,0,5.566-5.847,5.655,5.655,0,0,0-5.6-5.886Zm0,13.217a7.139,7.139,0,0,1-7.229-7.332,7.255,7.255,0,1,1,14.5,0,7.2,7.2,0,0,1-7.268,7.37"
+                ></path>
+                <path
+                  d="M184.293,19.377H179.9v5.771h4.363c2.137,0,3.66-1.1,3.66-2.943S186.647,19.377,184.293,19.377Zm3.838,12.8-4.12-5.527H179.9v5.527h-1.663V17.892h6.116c3.122,0,5.118,1.689,5.118,4.248a4.171,4.171,0,0,1-3.839,4.158L190,32.108Z"
+                ></path>
+                <path
+                  d="M204.855,32.108h-2.009l-5.464-6.884-3.032,3.071v3.813h-1.6V17.892h1.6v8.5l8.176-8.5H204.6l-6.1,6.218Z"
+                ></path>
+                <path
+                  d="M211.994,24.226c3.174.691,4.632,1.843,4.632,4.043,0,2.457-2.034,4.043-4.849,4.043a8.33,8.33,0,0,1-5.809-2.278l1-1.177a6.77,6.77,0,0,0,4.875,2.009c1.906,0,3.173-1,3.173-2.431s-.717-2.1-3.7-2.725c-3.275-.716-4.772-1.766-4.772-4.12s1.97-3.839,4.67-3.839a7.422,7.422,0,0,1,5,1.753l-.934,1.279a6.246,6.246,0,0,0-4.108-1.548c-1.842,0-3.032,1.011-3.032,2.316s.729,2.111,3.839,2.777"
+                ></path>
+                <path
+                  d="M70.89,10.714l-7.818,20.28-7.831-20.28h-8.33l-7.818,20.28-7.83-20.28h-8.33L11.9,39.286h7.37l7.831-20.268,7.818,20.268h8.33L51.07,19.018,58.9,39.286h8.33L78.26,10.714Z"
+                ></path>
+              </g>
+            </svg>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- ==========================================================================
+       PÁGINA 6: RELATÓRIO DE CHAMADOS (IMAGEM GRÁFICOS + TABELA 14 COLUNAS)
+       ========================================================================== -->
+    <div class="page">
+      <table
+        width="100%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="border-bottom: 1px solid #e5e7eb; padding: 12px 40px 10px 40px"
+      >
+        <tr>
+          <td
+            align="left"
+            style="
+              font-size: 11px;
+              font-weight: bold;
+              color: #005295;
+              text-transform: uppercase;
+            "
+          >
+            RELATÓRIO {{CLIENT_NAME}}
+          </td>
+          <td align="right">
+            <span
+              style="
+                font-size: 11px;
+                font-weight: bold;
+                color: #64748b;
+                border: 1px solid #cbd5e1;
+                padding: 3px 12px;
+                border-radius: 3px;
+              "
+            >
+              {{REPORT_YEAR}}
+            </span>
+          </td>
+        </tr>
+      </table>
+
+      <div style="padding: 12px 40px">
+        <div
+          id="relatorio-chamados"
+          style="
+            font-size: 13px;
+            font-weight: bold;
+            color: #005295;
+            margin-bottom: 8px;
+          "
+        >
+          Relatório de Chamados
+        </div>
+
+        <!-- ÁREA DA IMAGEM DOS GRÁFICOS (JPEG QUE A EQUIPE INCORPORA) -->
+        <div
+          style="
+            width: 100%;
+            text-align: center;
+            margin-bottom: 10px;
+            background: #001533;
+            border-radius: 4px;
+            overflow: hidden;
+          "
+        >
+          <img
+            src="{{URL_IMAGEM_GRAFICOS_CHAMADOS}}"
+            alt="Gráficos de SLA, Horas Categorias e Tipo de Chamado"
+            style="
+              width: 100%;
+              max-height: 115px;
+              object-fit: contain;
+              display: block;
+            "
+            onerror="
+              this.style.display = 'none';
+              document.getElementById('placeholder-grafico').style.display =
+                'block';
+            "
+          />
+          <div
+            id="placeholder-grafico"
+            style="
+              display: none;
+              padding: 16px;
+              color: #ffffff;
+              font-size: 11px;
+              background: #031c49;
+            "
+          >
+            📊
+            <strong
+              >[IMAGEM DOS GRÁFICOS: SLA Atendimento, SLA Solução, Horas
+              Categorias e Tipo do Chamado]</strong
+            >
+          </div>
+        </div>
+
+        <!-- TABELA COM AS 14 COLUNAS VISÍVEIS -->
+        <table
+          width="100%"
+          cellpadding="3"
+          cellspacing="0"
+          border="0"
+          style="
+            border-collapse: collapse;
+            border: 1px solid #cbd5e1;
+            font-size: 7.5px;
+            table-layout: fixed;
+          "
+        >
+          <thead>
+            <tr
+              style="
+                background: #005096;
+                color: #ffffff;
+                font-weight: bold;
+                text-transform: uppercase;
+              "
+            >
+              <th
+                width="4.5%"
+                style="
+                  padding: 4px 2px;
+                  text-align: center;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                ID
+              </th>
+              <th
+                width="20%"
+                style="
+                  padding: 4px 4px;
+                  text-align: left;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                TÍTULO CHAMADO
+              </th>
+              <th
+                width="6.5%"
+                style="
+                  padding: 4px 2px;
+                  text-align: center;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                CATEGORIA
+              </th>
+              <th
+                width="6.5%"
+                style="
+                  padding: 4px 2px;
+                  text-align: center;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                TIPO
+              </th>
+              <th
+                width="10%"
+                style="
+                  padding: 4px 3px;
+                  text-align: left;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                SOLICITANTE
+              </th>
+              <th
+                width="11%"
+                style="
+                  padding: 4px 3px;
+                  text-align: left;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                ANALISTA
+              </th>
+              <th
+                width="5.5%"
+                style="
+                  padding: 4px 2px;
+                  text-align: center;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                PRIORIDADE
+              </th>
+              <th
+                width="5.5%"
+                style="
+                  padding: 4px 2px;
+                  text-align: center;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                STATUS
+              </th>
+              <th
+                width="7.5%"
+                style="
+                  padding: 4px 2px;
+                  text-align: center;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                ABERTURA
+              </th>
+              <th
+                width="7.5%"
+                style="
+                  padding: 4px 2px;
+                  text-align: center;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                ATENDIMENTO
+              </th>
+              <th
+                width="7.5%"
+                style="
+                  padding: 4px 2px;
+                  text-align: center;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                SOLUÇÃO
+              </th>
+              <th
+                width="5%"
+                style="
+                  padding: 4px 2px;
+                  text-align: center;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                TOTAL HORAS
+              </th>
+              <th
+                width="6.5%"
+                style="
+                  padding: 4px 2px;
+                  text-align: center;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                SLA Atendimento
+              </th>
+              <th width="6.5%" style="padding: 4px 2px; text-align: center">
+                SLA Solução
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Chamado 1 -->
+            <tr style="border-bottom: 1px solid #e2e8f0; background: #ffffff">
+              <td
+                align="center"
+                style="
+                  font-weight: bold;
+                  color: #005096;
+                  border-right: 1px solid #f1f5f9;
+                "
+              >
+                80116
+              </td>
+              <td style="border-right: 1px solid #f1f5f9; padding: 3px 4px">
+                Realizar análise de vulnerabilidade de um container Docker.
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Firewall
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Requisição
+              </td>
+              <td style="border-right: 1px solid #f1f5f9">Lucio Barbiero</td>
+              <td style="border-right: 1px solid #f1f5f9">
+                João Victor Pretti Ribeiro Soares
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Média
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Fechado
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                11/08/2026 08:10:59
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                11/08/2026 08:30:14
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                27/08/2026 09:49:37
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                03:10:00
+              </td>
+              <td
+                align="center"
+                style="
+                  border-right: 1px solid #f1f5f9;
+                  color: #15803d;
+                  font-weight: bold;
+                "
+              >
+                No prazo
+              </td>
+              <td align="center" style="color: #15803d; font-weight: bold">
+                No prazo
+              </td>
+            </tr>
+            <!-- Chamado 2 -->
+            <tr style="border-bottom: 1px solid #e2e8f0; background: #f9fafb">
+              <td
+                align="center"
+                style="
+                  font-weight: bold;
+                  color: #005096;
+                  border-right: 1px solid #f1f5f9;
+                "
+              >
+                80405
+              </td>
+              <td style="border-right: 1px solid #f1f5f9; padding: 3px 4px">
+                Verificar se há algum bloqueio de firewall no servidor vsrv334
+                (Fabric)
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Firewall
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Requisição
+              </td>
+              <td style="border-right: 1px solid #f1f5f9">Lucio Barbiero</td>
+              <td style="border-right: 1px solid #f1f5f9">
+                Michel Perrino Bitarian
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Média
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Fechado
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                14/08/2026 16:27:02
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                14/08/2026 16:36:24
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                19/08/2026 14:18:10
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                00:55:00
+              </td>
+              <td
+                align="center"
+                style="
+                  border-right: 1px solid #f1f5f9;
+                  color: #15803d;
+                  font-weight: bold;
+                "
+              >
+                No prazo
+              </td>
+              <td align="center" style="color: #15803d; font-weight: bold">
+                No prazo
+              </td>
+            </tr>
+            <!-- Chamado 3 -->
+            <tr style="border-bottom: 1px solid #e2e8f0; background: #ffffff">
+              <td
+                align="center"
+                style="
+                  font-weight: bold;
+                  color: #005096;
+                  border-right: 1px solid #f1f5f9;
+                "
+              >
+                80608
+              </td>
+              <td style="border-right: 1px solid #f1f5f9; padding: 3px 4px">
+                URGENTE - Falha de certificado no acesso a Internet
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Firewall
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Incidente
+              </td>
+              <td style="border-right: 1px solid #f1f5f9">Lucio Barbiero</td>
+              <td style="border-right: 1px solid #f1f5f9">
+                Michel Perrino Bitarian
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Média
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Fechado
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                18/08/2026 08:01:57
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                18/08/2026 08:09:06
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                28/08/2026 08:58:50
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                01:25:00
+              </td>
+              <td
+                align="center"
+                style="
+                  border-right: 1px solid #f1f5f9;
+                  color: #15803d;
+                  font-weight: bold;
+                "
+              >
+                No prazo
+              </td>
+              <td align="center" style="color: #15803d; font-weight: bold">
+                No prazo
+              </td>
+            </tr>
+            <!-- Chamado 4 -->
+            <tr style="border-bottom: 1px solid #e2e8f0; background: #f9fafb">
+              <td
+                align="center"
+                style="
+                  font-weight: bold;
+                  color: #005096;
+                  border-right: 1px solid #f1f5f9;
+                "
+              >
+                80673
+              </td>
+              <td style="border-right: 1px solid #f1f5f9; padding: 3px 4px">
+                Análise Vulnerabilidade - Abril|Maio|Junho-2026
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Segurança
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Requisição
+              </td>
+              <td style="border-right: 1px solid #f1f5f9">Lucio Barbiero</td>
+              <td style="border-right: 1px solid #f1f5f9">
+                Jairo Rodrigues Trancoso Junior
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Média
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Fechado
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                18/08/2026 17:19:38
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                18/08/2026 17:19:59
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                31/08/2026 08:58:07
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                02:40:00
+              </td>
+              <td
+                align="center"
+                style="
+                  border-right: 1px solid #f1f5f9;
+                  color: #15803d;
+                  font-weight: bold;
+                "
+              >
+                No prazo
+              </td>
+              <td align="center" style="color: #15803d; font-weight: bold">
+                No prazo
+              </td>
+            </tr>
+            <!-- Chamado 5 -->
+            <tr style="border-bottom: 1px solid #e2e8f0; background: #ffffff">
+              <td
+                align="center"
+                style="
+                  font-weight: bold;
+                  color: #005096;
+                  border-right: 1px solid #f1f5f9;
+                "
+              >
+                80753
+              </td>
+              <td style="border-right: 1px solid #f1f5f9; padding: 3px 4px">
+                WAF/Firewall - Configuração de WebSocket - Hermes
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Firewall
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Requisição
+              </td>
+              <td style="border-right: 1px solid #f1f5f9">
+                Luiz Carlos Fraga Junior
+              </td>
+              <td style="border-right: 1px solid #f1f5f9">
+                Michel Perrino Bitarian
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Média
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Fechado
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                19/08/2026 12:27:43
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                19/08/2026 13:23:31
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                19/08/2026 15:19:12
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                00:35:00
+              </td>
+              <td
+                align="center"
+                style="
+                  border-right: 1px solid #f1f5f9;
+                  color: #15803d;
+                  font-weight: bold;
+                "
+              >
+                No prazo
+              </td>
+              <td align="center" style="color: #15803d; font-weight: bold">
+                No prazo
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer com Respiro Amplo -->
+      <table
+        width="100%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          border-top: 1px solid #f1f5f9;
+          padding: 10px 40px 14px 40px;
+        "
+      >
+        <tr>
+          <td align="left" style="font-size: 10px; color: #94a3b8">
+            Relatório de Chamados
+          </td>
+          <td align="right">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="120"
+              height="16"
+              viewBox="0 0 204.721 28.571"
+              role="img"
+              aria-label="Mindworks"
+              style="display: block"
+            >
+              <g transform="translate(-11.905 -10.714)" fill="#005295">
+                <path d="M105.219,17.892h-1.6V32.108h1.6Z"></path>
+                <path
+                  d="M119.588,17.892h1.574V32.108h-1.279L110.7,20.451V32.108h-1.561V17.892h1.5l8.956,11.4Z"
+                ></path>
+                <path
+                  d="M129.978,19.377h-3.327v11.26h3.327a5.633,5.633,0,1,0,0-11.247Zm0,12.808h-4.939V17.892h4.939c4.465,0,7.562,3.071,7.562,7.089a7.127,7.127,0,0,1-7.562,7.127"
+                ></path>
+                <path
+                  d="M148.4,17.854h1.318l3.9,11.887,4.069-11.848h1.676l-5.08,14.318h-1.356l-3.9-11.528L145.114,32.21h-1.343l-5.08-14.318h1.753L144.5,29.74Z"
+                ></path>
+                <path
+                  d="M91.183,32.21H89.865l-3.9-11.887L81.894,32.172H80.218L85.3,17.854h1.356l3.9,11.541,3.915-11.541h1.344l5.08,14.318H99.142L95.086,20.323Z"
+                ></path>
+                <path
+                  d="M167.864,19.133a5.593,5.593,0,0,0-5.566,5.847,5.656,5.656,0,0,0,5.6,5.886,5.59,5.59,0,0,0,5.566-5.847,5.655,5.655,0,0,0-5.6-5.886Zm0,13.217a7.139,7.139,0,0,1-7.229-7.332,7.255,7.255,0,1,1,14.5,0,7.2,7.2,0,0,1-7.268,7.37"
+                ></path>
+                <path
+                  d="M184.293,19.377H179.9v5.771h4.363c2.137,0,3.66-1.1,3.66-2.943S186.647,19.377,184.293,19.377Zm3.838,12.8-4.12-5.527H179.9v5.527h-1.663V17.892h6.116c3.122,0,5.118,1.689,5.118,4.248a4.171,4.171,0,0,1-3.839,4.158L190,32.108Z"
+                ></path>
+                <path
+                  d="M204.855,32.108h-2.009l-5.464-6.884-3.032,3.071v3.813h-1.6V17.892h1.6v8.5l8.176-8.5H204.6l-6.1,6.218Z"
+                ></path>
+                <path
+                  d="M211.994,24.226c3.174.691,4.632,1.843,4.632,4.043,0,2.457-2.034,4.043-4.849,4.043a8.33,8.33,0,0,1-5.809-2.278l1-1.177a6.77,6.77,0,0,0,4.875,2.009c1.906,0,3.173-1,3.173-2.431s-.717-2.1-3.7-2.725c-3.275-.716-4.772-1.766-4.772-4.12s1.97-3.839,4.67-3.839a7.422,7.422,0,0,1,5,1.753l-.934,1.279a6.246,6.246,0,0,0-4.108-1.548c-1.842,0-3.032,1.011-3.032,2.316s.729,2.111,3.839,2.777"
+                ></path>
+                <path
+                  d="M70.89,10.714l-7.818,20.28-7.831-20.28h-8.33l-7.818,20.28-7.83-20.28h-8.33L11.9,39.286h7.37l7.831-20.268,7.818,20.268h8.33L51.07,19.018,58.9,39.286h8.33L78.26,10.714Z"
+                ></path>
+              </g>
+            </svg>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- ==========================================================================
+       PÁGINA 7: 2.2 RELATÓRIO DE EVENTOS & 2.3 RELATÓRIO DE JUSTIFICATIVAS (PÁG 9 DO PDF)
+       ========================================================================== -->
+    <div class="page">
+      <table
+        width="100%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="border-bottom: 1px solid #e5e7eb; padding: 12px 40px 10px 40px"
+      >
+        <tr>
+          <td
+            align="left"
+            style="
+              font-size: 11px;
+              font-weight: bold;
+              color: #005295;
+              text-transform: uppercase;
+            "
+          >
+            RELATÓRIO {{CLIENT_NAME}}
+          </td>
+          <td align="right">
+            <span
+              style="
+                font-size: 11px;
+                font-weight: bold;
+                color: #64748b;
+                border: 1px solid #cbd5e1;
+                padding: 3px 12px;
+                border-radius: 3px;
+              "
+            >
+              {{REPORT_YEAR}}
+            </span>
+          </td>
+        </tr>
+      </table>
+
+      <div style="padding: 12px 40px">
+        <!-- 2.2 Relatório de Eventos -->
+        <div
+          id="relatorio-eventos"
+          style="
+            font-size: 12px;
+            font-weight: bold;
+            color: #005295;
+            margin-bottom: 6px;
+          "
+        >
+          2.2 Relatório de Eventos
+        </div>
+        <table
+          width="100%"
+          cellpadding="3"
+          cellspacing="0"
+          border="0"
+          style="
+            border-collapse: collapse;
+            border: 1px solid #cbd5e1;
+            font-size: 7.5px;
+            table-layout: fixed;
+            margin-bottom: 12px;
+          "
+        >
+          <thead>
+            <tr
+              style="
+                background: #005096;
+                color: #ffffff;
+                font-weight: bold;
+                text-transform: uppercase;
+              "
+            >
+              <th
+                width="4.5%"
+                style="
+                  padding: 4px 2px;
+                  text-align: center;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                ID
+              </th>
+              <th
+                width="20%"
+                style="
+                  padding: 4px 4px;
+                  text-align: left;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                TÍTULO CHAMADO
+              </th>
+              <th
+                width="6.5%"
+                style="
+                  padding: 4px 2px;
+                  text-align: center;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                CATEGORIA
+              </th>
+              <th
+                width="6.5%"
+                style="
+                  padding: 4px 2px;
+                  text-align: center;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                TIPO
+              </th>
+              <th
+                width="10%"
+                style="
+                  padding: 4px 3px;
+                  text-align: left;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                SOLICITANTE
+              </th>
+              <th
+                width="11%"
+                style="
+                  padding: 4px 3px;
+                  text-align: left;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                ANALISTA
+              </th>
+              <th
+                width="5.5%"
+                style="
+                  padding: 4px 2px;
+                  text-align: center;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                PRIORIDADE
+              </th>
+              <th
+                width="5.5%"
+                style="
+                  padding: 4px 2px;
+                  text-align: center;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                STATUS
+              </th>
+              <th
+                width="7.5%"
+                style="
+                  padding: 4px 2px;
+                  text-align: center;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                ABERTURA
+              </th>
+              <th
+                width="7.5%"
+                style="
+                  padding: 4px 2px;
+                  text-align: center;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                ATENDIMENTO
+              </th>
+              <th
+                width="7.5%"
+                style="
+                  padding: 4px 2px;
+                  text-align: center;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                SOLUÇÃO
+              </th>
+              <th
+                width="5%"
+                style="
+                  padding: 4px 2px;
+                  text-align: center;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                TOTAL HORAS
+              </th>
+              <th
+                width="6.5%"
+                style="
+                  padding: 4px 2px;
+                  text-align: center;
+                  border-right: 1px solid #ffffff;
+                "
+              >
+                SLA Atendimento
+              </th>
+              <th width="6.5%" style="padding: 4px 2px; text-align: center">
+                SLA Solução
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Evento 1 -->
+            <tr style="border-bottom: 1px solid #e2e8f0; background: #ffffff">
+              <td
+                align="center"
+                style="
+                  font-weight: bold;
+                  color: #005295;
+                  border-right: 1px solid #f1f5f9;
+                "
+              >
+                81335
+              </td>
+              <td style="border-right: 1px solid #f1f5f9; padding: 3px 4px">
+                [cesan-zbproxy] - Zabbix Proxy cesan-zbproxy sem enviar dados
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Alerta(s)
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Incidente
+              </td>
+              <td style="border-right: 1px solid #f1f5f9">Lucio Barbiero</td>
+              <td style="border-right: 1px solid #f1f5f9">
+                Nilson Soares da Silva
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Média
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Fechado
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                27/08/2026 10:25:42
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                27/08/2026 10:25:56
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                27/08/2026 11:47:46
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                00:20:00
+              </td>
+              <td
+                align="center"
+                style="
+                  border-right: 1px solid #f1f5f9;
+                  color: #15803d;
+                  font-weight: bold;
+                "
+              >
+                No prazo
+              </td>
+              <td align="center" style="color: #15803d; font-weight: bold">
+                No prazo
+              </td>
+            </tr>
+            <!-- Evento 2 -->
+            <tr style="background: #f9fafb">
+              <td
+                align="center"
+                style="
+                  font-weight: bold;
+                  color: #005096;
+                  border-right: 1px solid #f1f5f9;
+                "
+              >
+                82272
+              </td>
+              <td style="border-right: 1px solid #f1f5f9; padding: 3px 4px">
+                [CESAN FW - WFT-FDC]-CESAN FW - WFT-FDC
+                LINK_MONITOR_PARCEIROS_ACCIONA Indisponível
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Alerta(s)
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Incidente
+              </td>
+              <td style="border-right: 1px solid #f1f5f9">Lucio Barbiero</td>
+              <td style="border-right: 1px solid #f1f5f9">
+                Jairo Rodrigues Trancoso Junior
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Média
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                Fechado
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                12/09/2026 09:38:47
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                12/09/2026 09:39:14
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                13/09/2026 09:34:36
+              </td>
+              <td align="center" style="border-right: 1px solid #f1f5f9">
+                00:05:00
+              </td>
+              <td
+                align="center"
+                style="
+                  border-right: 1px solid #f1f5f9;
+                  color: #15803d;
+                  font-weight: bold;
+                "
+              >
+                No prazo
+              </td>
+              <td align="center" style="color: #15803d; font-weight: bold">
+                No prazo
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- 2.3 Relatório de Justificativas -->
+        <div
+          id="relatorio-justificativas"
+          style="
+            font-size: 12px;
+            font-weight: bold;
+            color: #005295;
+            margin-bottom: 6px;
+          "
+        >
+          2.3 Relatório de Justificativas
+        </div>
+
+        <!-- Quadro Indicadores Justificados com Linha Centralizada (Sem marca isolada) -->
+        <table
+          width="100%"
+          cellpadding="0"
+          cellspacing="0"
+          border="0"
+          style="
+            border: 1.5px solid #005096;
+            border-collapse: collapse;
+            background: #ffffff;
+          "
+        >
+          <tr>
+            <td
+              align="center"
+              style="
+                padding: 8px 14px;
+                border-bottom: 1.5px solid #005096;
+                font-size: 11px;
+                font-weight: bold;
+                color: #000e27;
+                text-transform: uppercase;
+              "
+            >
+              RELATÓRIO DE CHAMADOS - CONTRATO - {{CONTRACT_NUMBER}}
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding: 0; border-bottom: 1.5px solid #005096">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td
+                    width="15%"
+                    style="
+                      background: #ffffff;
+                      border-right: 1px solid #005096;
+                      padding: 5px 10px;
+                      font-size: 10px;
+                      font-weight: bold;
+                      color: #000e27;
+                    "
+                  >
+                    Período
+                  </td>
+                  <td
+                    width="85%"
+                    align="center"
+                    style="
+                      padding: 5px 10px;
+                      font-size: 10px;
+                      font-weight: bold;
+                      color: #000e27;
+                    "
+                  >
+                    {{REPORT_YEAR}}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td
+              align="center"
+              style="
+                background: #000e27;
+                color: #ffffff;
+                font-size: 10.5px;
+                font-weight: bold;
+                padding: 4px 8px;
+                letter-spacing: 0.5px;
+                text-transform: uppercase;
+              "
+            >
+              PAINEL DE INDICADORES JUSTIFICADOS
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <table
+                width="100%"
+                cellpadding="4"
+                cellspacing="0"
+                border="0"
+                style="border-collapse: collapse; font-size: 9.5px"
+              >
+                <thead>
+                  <tr style="background: #205493; color: #ffffff">
+                    <th
+                      align="center"
+                      width="10%"
+                      rowspan="2"
+                      style="border-right: 1px solid #ffffff; padding: 4px"
+                    >
+                      ID
+                    </th>
+                    <th
+                      align="left"
+                      width="46%"
+                      rowspan="2"
+                      style="border-right: 1px solid #ffffff; padding: 4px 10px"
+                    >
+                      Indicador
+                    </th>
+                    <th
+                      align="center"
+                      width="14%"
+                      rowspan="2"
+                      style="border-right: 1px solid #ffffff; padding: 4px"
+                    >
+                      Meta
+                    </th>
+                    <th
+                      align="center"
+                      colspan="3"
+                      style="padding: 3px; border-bottom: 1px solid #ffffff"
+                    >
+                      {{REPORT_YEAR}}
+                    </th>
+                  </tr>
+                  <tr
+                    style="
+                      background: #205493;
+                      color: #ffffff;
+                      font-size: 8.5px;
+                    "
+                  >
+                    <th
+                      align="center"
+                      width="10%"
+                      style="border-right: 1px solid #ffffff; padding: 3px"
+                    >
+                      atendido
+                    </th>
+                    <th
+                      align="center"
+                      width="10%"
+                      style="border-right: 1px solid #ffffff; padding: 3px"
+                    >
+                      não atend.
+                    </th>
+                    <th align="center" width="10%" style="padding: 3px">
+                      indicador
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    style="
+                      border-bottom: 1px solid #cbd5e1;
+                      background: #ffffff;
+                    "
+                  >
+                    <td
+                      align="center"
+                      style="
+                        border-right: 1px solid #cbd5e1;
+                        font-weight: bold;
+                        color: #005096;
+                      "
+                    >
+                      SLA01
+                    </td>
+                    <td
+                      style="border-right: 1px solid #cbd5e1; padding: 4px 10px"
+                    >
+                      Prazo de atendimento dos chamados
+                    </td>
+                    <td align="center" style="border-right: 1px solid #cbd5e1">
+                      &ge; 90%
+                    </td>
+                    <td align="center" style="border-right: 1px solid #cbd5e1">
+                      17
+                    </td>
+                    <td align="center" style="border-right: 1px solid #cbd5e1">
+                      0
+                    </td>
+                    <td
+                      align="center"
+                      style="font-weight: bold; color: #000e27"
+                    >
+                      100,00%
+                    </td>
+                  </tr>
+                  <tr
+                    style="
+                      border-bottom: 1px solid #cbd5e1;
+                      background: #f8fafc;
+                    "
+                  >
+                    <td
+                      align="center"
+                      style="
+                        border-right: 1px solid #cbd5e1;
+                        font-weight: bold;
+                        color: #005096;
+                      "
+                    >
+                      SLA02
+                    </td>
+                    <td
+                      style="border-right: 1px solid #cbd5e1; padding: 4px 10px"
+                    >
+                      Disponibilidade dos serviços
+                    </td>
+                    <td align="center" style="border-right: 1px solid #cbd5e1">
+                      &ge; 99,5%
+                    </td>
+                    <td align="center" style="border-right: 1px solid #cbd5e1">
+                      0
+                    </td>
+                    <td align="center" style="border-right: 1px solid #cbd5e1">
+                      0
+                    </td>
+                    <td
+                      align="center"
+                      style="font-weight: bold; color: #000e27"
+                    >
+                      100,00%
+                    </td>
+                  </tr>
+                  <tr
+                    style="
+                      border-bottom: 1.5px solid #005096;
+                      background: #ffffff;
+                    "
+                  >
+                    <td
+                      align="center"
+                      style="
+                        border-right: 1px solid #cbd5e1;
+                        font-weight: bold;
+                        color: #005096;
+                      "
+                    >
+                      SLA03
+                    </td>
+                    <td
+                      style="border-right: 1px solid #cbd5e1; padding: 4px 10px"
+                    >
+                      Qualidade da gestão dos serviços
+                    </td>
+                    <td align="center" style="border-right: 1px solid #cbd5e1">
+                      =100%
+                    </td>
+                    <td align="center" style="border-right: 1px solid #cbd5e1">
+                      0
+                    </td>
+                    <td align="center" style="border-right: 1px solid #cbd5e1">
+                      0
+                    </td>
+                    <td
+                      align="center"
+                      style="font-weight: bold; color: #000e27"
+                    >
+                      75,00%
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Faixa Justificativas -->
+          <tr>
+            <td
+              align="center"
+              style="
+                background: #000e27;
+                color: #ffffff;
+                font-size: 10px;
+                font-weight: bold;
+                padding: 4px 8px;
+                text-transform: uppercase;
+              "
+            >
+              Justificativas
+            </td>
+          </tr>
+          <tr>
+            <td
+              style="
+                padding: 10px 14px;
+                font-size: 9.5px;
+                color: #334155;
+                line-height: 1.5;
+              "
+            >
+              {{TEXTO_JUSTIFICATIVAS}}
+              <div style="font-style: italic; color: #64748b">
+                Nenhuma ocorrência fora do prazo justificável registrada para o
+                período de referência. Todos os chamados foram solucionados
+                dentro dos limites contratuais estabelecidos.
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Footer com Respiro Amplo -->
+      <table
+        width="100%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          border-top: 1px solid #f1f5f9;
+          padding: 10px 40px 14px 40px;
+        "
+      >
+        <tr>
+          <td align="left" style="font-size: 10px; color: #94a3b8">
+            Relatório de Eventos e Justificativas
+          </td>
+          <td align="right">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="120"
+              height="16"
+              viewBox="0 0 204.721 28.571"
+              role="img"
+              aria-label="Mindworks"
+              style="display: block"
+            >
+              <g transform="translate(-11.905 -10.714)" fill="#005295">
+                <path d="M105.219,17.892h-1.6V32.108h1.6Z"></path>
+                <path
+                  d="M119.588,17.892h1.574V32.108h-1.279L110.7,20.451V32.108h-1.561V17.892h1.5l8.956,11.4Z"
+                ></path>
+                <path
+                  d="M129.978,19.377h-3.327v11.26h3.327a5.633,5.633,0,1,0,0-11.247Zm0,12.808h-4.939V17.892h4.939c4.465,0,7.562,3.071,7.562,7.089a7.127,7.127,0,0,1-7.562,7.127"
+                ></path>
+                <path
+                  d="M148.4,17.854h1.318l3.9,11.887,4.069-11.848h1.676l-5.08,14.318h-1.356l-3.9-11.528L145.114,32.21h-1.343l-5.08-14.318h1.753L144.5,29.74Z"
+                ></path>
+                <path
+                  d="M91.183,32.21H89.865l-3.9-11.887L81.894,32.172H80.218L85.3,17.854h1.356l3.9,11.541,3.915-11.541h1.344l5.08,14.318H99.142L95.086,20.323Z"
+                ></path>
+                <path
+                  d="M167.864,19.133a5.593,5.593,0,0,0-5.566,5.847,5.656,5.656,0,0,0,5.6,5.886,5.59,5.59,0,0,0,5.566-5.847,5.655,5.655,0,0,0-5.6-5.886Zm0,13.217a7.139,7.139,0,0,1-7.229-7.332,7.255,7.255,0,1,1,14.5,0,7.2,7.2,0,0,1-7.268,7.37"
+                ></path>
+                <path
+                  d="M184.293,19.377H179.9v5.771h4.363c2.137,0,3.66-1.1,3.66-2.943S186.647,19.377,184.293,19.377Zm3.838,12.8-4.12-5.527H179.9v5.527h-1.663V17.892h6.116c3.122,0,5.118,1.689,5.118,4.248a4.171,4.171,0,0,1-3.839,4.158L190,32.108Z"
+                ></path>
+                <path
+                  d="M204.855,32.108h-2.009l-5.464-6.884-3.032,3.071v3.813h-1.6V17.892h1.6v8.5l8.176-8.5H204.6l-6.1,6.218Z"
+                ></path>
+                <path
+                  d="M211.994,24.226c3.174.691,4.632,1.843,4.632,4.043,0,2.457-2.034,4.043-4.849,4.043a8.33,8.33,0,0,1-5.809-2.278l1-1.177a6.77,6.77,0,0,0,4.875,2.009c1.906,0,3.173-1,3.173-2.431s-.717-2.1-3.7-2.725c-3.275-.716-4.772-1.766-4.772-4.12s1.97-3.839,4.67-3.839a7.422,7.422,0,0,1,5,1.753l-.934,1.279a6.246,6.246,0,0,0-4.108-1.548c-1.842,0-3.032,1.011-3.032,2.316s.729,2.111,3.839,2.777"
+                ></path>
+                <path
+                  d="M70.89,10.714l-7.818,20.28-7.831-20.28h-8.33l-7.818,20.28-7.83-20.28h-8.33L11.9,39.286h7.37l7.831-20.268,7.818,20.268h8.33L51.07,19.018,58.9,39.286h8.33L78.26,10.714Z"
+                ></path>
+              </g>
+            </svg>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- ==========================================================================
+       PÁGINA 8: 3. FORMALIZAÇÃO E ACEITE DOS SERVIÇOS (TELA DE ASSINATURAS)
+       ========================================================================== -->
+    <div class="page">
+      <!-- Header com Respiro Amplo -->
+      <table
+        width="100%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="border-bottom: 1px solid #e5e7eb; padding: 15px 45px 12px 45px"
+      >
+        <tr>
+          <td
+            align="left"
+            style="
+              font-size: 11px;
+              font-weight: bold;
+              color: #005295;
+              text-transform: uppercase;
+            "
+          >
+            RELATÓRIO {{CLIENT_NAME}}
+          </td>
+          <td align="right">
+            <span
+              style="
+                font-size: 11px;
+                font-weight: bold;
+                color: #64748b;
+                border: 1px solid #cbd5e1;
+                padding: 3px 12px;
+                border-radius: 3px;
+              "
+            >
+              {{REPORT_YEAR}}
+            </span>
+          </td>
+        </tr>
+      </table>
+
+      <div style="padding: 30px 45px">
+        <div
+          id="formalizacao-aceite"
+          style="
+            font-size: 16px;
+            font-weight: bold;
+            color: #005295;
+            margin-bottom: 12px;
+          "
+        >
+          3. Formalização e Aceite dos Serviços
+        </div>
+
+        <p
+          style="
+            font-size: 11.5px;
+            line-height: 1.75;
+            color: #334155;
+            text-align: justify;
+            margin-bottom: 55px;
+          "
+        >
+          Pelo presente instrumento, as partes atestam que os serviços de
+          suporte especializado discriminados neste relatório técnico foram
+          devidamente executados em conformidade com as normas, prazos e Acordos
+          de Nível de Serviço (SLA) estabelecidos entre as partes contratantes,
+          servindo este termo como validação e aceite formal do período
+          correspondente.
+        </p>
+
+        <!-- Blocos de Assinatura Lado a Lado -->
+        <table
+          width="100%"
+          cellpadding="0"
+          cellspacing="0"
+          border="0"
+          style="margin-top: 20px"
+        >
+          <tr>
+            <!-- Assinatura Mindworks -->
+            <td width="42%" align="center" valign="top">
+              <div
+                style="
+                  width: 100%;
+                  border-top: 1.5px solid #000e27;
+                  margin-bottom: 10px;
+                "
+              ></div>
+              <div style="font-size: 12px; font-weight: bold; color: #000e27">
+                {{MINDWORKS_REP_NAME}}
+              </div>
+              <div style="font-size: 11px; color: #005295; margin-top: 2px">
+                {{MINDWORKS_REP_TITLE}}
+              </div>
+              <div style="font-size: 10px; color: #64748b; margin-top: 2px">
+                Mindworks Informática Ltda.
+              </div>
+              <div style="font-size: 10px; color: #94a3b8; margin-top: 8px">
+                Data: ____/____/{{REPORT_YEAR}}
+              </div>
+            </td>
+
+            <td width="16%">&nbsp;</td>
+
+            <!-- Assinatura Cliente -->
+            <td width="42%" align="center" valign="top">
+              <div
+                style="
+                  width: 100%;
+                  border-top: 1.5px solid #000e27;
+                  margin-bottom: 10px;
+                "
+              ></div>
+              <div style="font-size: 12px; font-weight: bold; color: #000e27">
+                {{CLIENT_REP_NAME}}
+              </div>
+              <div style="font-size: 11px; color: #005295; margin-top: 2px">
+                {{CLIENT_REP_TITLE}}
+              </div>
+              <div style="font-size: 10px; color: #64748b; margin-top: 2px">
+                {{CLIENT_NAME}}
+              </div>
+              <div style="font-size: 10px; color: #94a3b8; margin-top: 8px">
+                Data: ____/____/{{REPORT_YEAR}}
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Footer com Respiro Amplo -->
+      <table
+        width="100%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          border-top: 1px solid #f1f5f9;
+          padding: 12px 45px 15px 45px;
+        "
+      >
+        <tr>
+          <td align="left" style="font-size: 10px; color: #94a3b8">
+            Termo de Aceite e Formalização de Serviços
+          </td>
+          <td align="right">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="125"
+              height="17"
+              viewBox="0 0 204.721 28.571"
+              role="img"
+              aria-label="Mindworks"
+              style="display: block"
+            >
+              <g transform="translate(-11.905 -10.714)" fill="#005295">
+                <path d="M105.219,17.892h-1.6V32.108h1.6Z"></path>
+                <path
+                  d="M119.588,17.892h1.574V32.108h-1.279L110.7,20.451V32.108h-1.561V17.892h1.5l8.956,11.4Z"
+                ></path>
+                <path
+                  d="M129.978,19.377h-3.327v11.26h3.327a5.633,5.633,0,1,0,0-11.247Zm0,12.808h-4.939V17.892h4.939c4.465,0,7.562,3.071,7.562,7.089a7.127,7.127,0,0,1-7.562,7.127"
+                ></path>
+                <path
+                  d="M148.4,17.854h1.318l3.9,11.887,4.069-11.848h1.676l-5.08,14.318h-1.356l-3.9-11.528L145.114,32.21h-1.343l-5.08-14.318h1.753L144.5,29.74Z"
+                ></path>
+                <path
+                  d="M91.183,32.21H89.865l-3.9-11.887L81.894,32.172H80.218L85.3,17.854h1.356l3.9,11.541,3.915-11.541h1.344l5.08,14.318H99.142L95.086,20.323Z"
+                ></path>
+                <path
+                  d="M167.864,19.133a5.593,5.593,0,0,0-5.566,5.847,5.656,5.656,0,0,0,5.6,5.886,5.59,5.59,0,0,0,5.566-5.847,5.655,5.655,0,0,0-5.6-5.886Zm0,13.217a7.139,7.139,0,0,1-7.229-7.332,7.255,7.255,0,1,1,14.5,0,7.2,7.2,0,0,1-7.268,7.37"
+                ></path>
+                <path
+                  d="M184.293,19.377H179.9v5.771h4.363c2.137,0,3.66-1.1,3.66-2.943S186.647,19.377,184.293,19.377Zm3.838,12.8-4.12-5.527H179.9v5.527h-1.663V17.892h6.116c3.122,0,5.118,1.689,5.118,4.248a4.171,4.171,0,0,1-3.839,4.158L190,32.108Z"
+                ></path>
+                <path
+                  d="M204.855,32.108h-2.009l-5.464-6.884-3.032,3.071v3.813h-1.6V17.892h1.6v8.5l8.176-8.5H204.6l-6.1,6.218Z"
+                ></path>
+                <path
+                  d="M211.994,24.226c3.174.691,4.632,1.843,4.632,4.043,0,2.457-2.034,4.043-4.849,4.043a8.33,8.33,0,0,1-5.809-2.278l1-1.177a6.77,6.77,0,0,0,4.875,2.009c1.906,0,3.173-1,3.173-2.431s-.717-2.1-3.7-2.725c-3.275-.716-4.772-1.766-4.772-4.12s1.97-3.839,4.67-3.839a7.422,7.422,0,0,1,5,1.753l-.934,1.279a6.246,6.246,0,0,0-4.108-1.548c-1.842,0-3.032,1.011-3.032,2.316s.729,2.111,3.839,2.777"
+                ></path>
+                <path
+                  d="M70.89,10.714l-7.818,20.28-7.831-20.28h-8.33l-7.818,20.28-7.83-20.28h-8.33L11.9,39.286h7.37l7.831-20.268,7.818,20.268h8.33L51.07,19.018,58.9,39.286h8.33L78.26,10.714Z"
+                ></path>
+              </g>
+            </svg>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

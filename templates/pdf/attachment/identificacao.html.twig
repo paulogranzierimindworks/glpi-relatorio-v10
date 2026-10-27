@@ -1,0 +1,12 @@
+{#
+ # Attachment, "Identificação e controle do documento". The rounded blue frame
+ # is drawn natively around this table (AttachmentPdfDocument::writeBodyInCard).
+ #}
+<table width="100%" cellpadding="7" cellspacing="0" style="font-size:9pt;">
+  {% for row in rows %}
+  <tr>
+    <td width="35%" style="color:#005096;{{ not loop.last ? 'border-bottom:0.4pt solid #cbd5e1;' }}"><b>{{ row.label }}</b></td>
+    <td width="65%" style="color:#1e293b;{{ not loop.last ? 'border-bottom:0.4pt solid #cbd5e1;' }}">{{ row.value }}</td>
+  </tr>
+  {% endfor %}
+</table>
